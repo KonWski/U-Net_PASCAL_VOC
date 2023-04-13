@@ -15,6 +15,7 @@ def train_model(
         checkpoints_dir: str,
         download_datasets: bool,
         root_datasets_dir: str,
+        year: str,
         selected_classes: List[str]
     ):
     '''
@@ -26,6 +27,8 @@ def train_model(
         path to directory where checkpoints will be stored
     download_datasets: bool
         True -> download dataset from torchvision repo
+    year: str
+        year of Pascal VOC competition "2007" to "2012"
     root_datasets_dir: str
         path to directory where dataset should be downloaded (download_datasets = True)
         or where dataset is already stored
@@ -41,11 +44,11 @@ def train_model(
     ])
 
     # datasets and dataloaders
-    trainset = PascalVOCSegmentation(f'{root_datasets_dir}/train/', image_set="train", selected_classes=selected_classes, 
+    trainset = PascalVOCSegmentation(f'{root_datasets_dir}/train/', year, image_set="train", selected_classes=selected_classes, 
                                      download=download_datasets, transform=transform_train)
     train_loader = DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
 
-    testset = PascalVOCSegmentation(f'{root_datasets_dir}/test/', image_set="test", selected_classes=selected_classes, 
+    testset = PascalVOCSegmentation(f'{root_datasets_dir}/test/', year, image_set="test", selected_classes=selected_classes, 
                                      download=download_datasets)
     test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
 

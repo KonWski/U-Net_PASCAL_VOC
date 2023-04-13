@@ -10,6 +10,7 @@ def get_args():
     parser.add_argument('--checkpoints_dir', type=str, help='Path to directory where checkpoint will be saved')
     parser.add_argument('--download_datasets', type=str, help='Download dataset from Torchvision repo or use already existing dataset')
     parser.add_argument('--root_datasets_dir', type=str, help='Path where dataset should be downloaded or where is it already stored')
+    parser.add_argument('--year', type=str, help='year of Pascal VOC competition "2007" to "2012"')
     parser.add_argument('--selected_classes', type=str, help='classes seperated by commas')
 
     args = vars(parser.parse_args())
@@ -46,4 +47,4 @@ if __name__ == "__main__":
     logging.info(f"Device: {device}")
 
     model = train_model(device, args["n_epochs"], args["checkpoints_dir"], args["checkpoints_dir"], 
-                        args["root_datasets_dir"], args["selected_classes"])
+                        args["root_datasets_dir"], args["year"], args["selected_classes"])

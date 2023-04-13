@@ -12,7 +12,6 @@ from datetime import datetime
 def train_model(
         device, 
         n_epochs: int,
-        batch_size: int,
         checkpoints_dir: str,
         download_datasets: bool,
         root_datasets_dir: str,
@@ -34,6 +33,8 @@ def train_model(
         names of selected classes
     '''
 
+    BATCH_SIZE = 1
+
     transform_train = transforms.Compose([
         transforms.ToTensor(),
         transforms.RandomHorizontalFlip(p=0.5)
@@ -42,11 +43,11 @@ def train_model(
     # datasets and dataloaders
     trainset = PascalVOCSegmentation(f'{root_datasets_dir}/train/', image_set="train", selected_classes=selected_classes, 
                                      download=download_datasets, transform=transform_train)
-    train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
 
     testset = PascalVOCSegmentation(f'{root_datasets_dir}/test/', image_set="test", selected_classes=selected_classes, 
                                      download=download_datasets)
-    test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
 
     n_classes = len(selected_classes)
     len_trainset = len(trainset)

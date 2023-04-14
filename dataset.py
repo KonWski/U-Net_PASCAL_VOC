@@ -9,6 +9,7 @@ import math
 import torch.nn.functional as F
 from typing import Optional
 import random
+from PIL import Image
 
 class PascalVOCSegmentation(VOCSegmentation):
 
@@ -112,8 +113,11 @@ class PascalVOCSegmentation(VOCSegmentation):
 
     def __getitem__(self, idx):
         
-        image = cv2.imread(self.images[idx])
-        mask = cv2.imread(self.masks[idx])
+        # image = cv2.imread(self.images[idx])
+        # mask = cv2.imread(self.masks[idx])
+
+        image = Image.open(self.images[idx])
+        mask = Image.open(self.masks[idx])
 
         if self.augmentation:
             image, mask = self._transform(image, mask)

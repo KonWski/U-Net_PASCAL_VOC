@@ -126,8 +126,10 @@ class PascalVOCSegmentation(VOCSegmentation):
         mask = to_tensor(mask)
 
         # additional channel for background
+        print(f"mask.shape: {mask.shape}")
         encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
-        
+        print(f"encoded_mask.shape: {encoded_mask.shape}")
+
         # convert color encoding into channel encoding -
         # - each channel refers to specific class
         for selected_class in self.selected_classes:

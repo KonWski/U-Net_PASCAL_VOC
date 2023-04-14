@@ -2,7 +2,6 @@ from typing import List
 from dataset import PascalVOCSegmentation, split_image_mask
 import torch
 from torch.utils.data import DataLoader
-from torchvision import transforms
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.optim import Adam
 from model import uNetPascalVOC
@@ -38,14 +37,9 @@ def train_model(
 
     BATCH_SIZE = 1
 
-    transform_train = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.RandomHorizontalFlip(p=0.5)
-    ])
-
     # datasets and dataloaders
     trainset = PascalVOCSegmentation(f'{root_datasets_dir}/train/', year, image_set="train", selected_classes=selected_classes, 
-                                     download=download_datasets, transform=transform_train)
+                                     download=download_datasets, augmentation=True)
     train_loader = DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
 
     testset = PascalVOCSegmentation(f'{root_datasets_dir}/test/', year, image_set="test", selected_classes=selected_classes, 

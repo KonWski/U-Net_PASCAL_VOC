@@ -1,11 +1,14 @@
 from torchvision.datasets import VOCSegmentation
 from torchvision import transforms
+from torchvision.transforms.functional import vflip
 import cv2
 import numpy as np
 import torch
 from typing import List
 import math
 import torch.nn.functional as F
+from typing import Optional
+import random
 
 class PascalVOCSegmentation(VOCSegmentation):
 
@@ -14,9 +17,9 @@ class PascalVOCSegmentation(VOCSegmentation):
             root: str, 
             year: str, 
             image_set: str, 
-            selected_classes: List[str], 
-            download: bool = False, 
-            transform: transforms = None
+            download: bool,
+            selected_classes: List[str],
+            augmentation: bool = False
             ):
         '''
         Dataset limiting original VOCSegmentation to specified class_name
@@ -27,16 +30,17 @@ class PascalVOCSegmentation(VOCSegmentation):
             year of competition "2007" to "2012"
         image_set: str
             "train", "trainval", "test"
-        selected_classes: List[str]:
-            names of selected classes
         download: bool
             True -> downloads dataset from repo
             False -> uses already existing dataset
-        transform:
-            transforms performed on image and mask
+        selected_classes: List[str]:
+            names of selected classes
+        augmentation: bool = False
+            perform augmentation using parallel transformations on image and mask        
         '''
-        super().__init__(root, year, image_set, download, transform)
+        super().__init__(root, year, image_set, download, transforms=transforms)
         self.selected_classes = selected_classes
+        self.augmentation = augmentation
         self._classes_names = [
             "background",
             "aeroplane",
@@ -96,15 +100,23 @@ class PascalVOCSegmentation(VOCSegmentation):
                                for id, selected_class in enumerate(self.selected_classes)}
 
 
+    def _transform(self, image, mask):
+
+        # random vertical flip
+        if random.random() > 0.5:
+            image = vflip(image)
+            mask = vflip(mask)
+                    
+        return image, mask
+
+
     def __getitem__(self, idx):
         
         image = cv2.imread(self.images[idx])
         mask = cv2.imread(self.masks[idx])
 
-        if self.transform:
-            transforms = self.transform(image = image, mask = mask)
-            image = transforms(image)
-            mask = transforms(mask)
+        if self.augmentation:
+            image, mask = self._transform(image, mask)
 
         # additional channel for background
         encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])

@@ -127,7 +127,9 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         # additional channel for background
         print(f"mask.shape: {mask.shape}")
-        encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
+        # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
+        encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
+
         print(f"encoded_mask.shape: {encoded_mask.shape}")
 
         # convert color encoding into channel encoding -
@@ -137,7 +139,8 @@ class PascalVOCSegmentation(VOCSegmentation):
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
             class_pixels_indices = np.where(mask == class_color_encoding)
-            encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1        
+            # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
+            encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1        
 
         return image, encoded_mask
     

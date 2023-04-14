@@ -7,9 +7,9 @@ import torch
 from typing import List
 import math
 import torch.nn.functional as F
-from typing import Optional
 import random
 from PIL import Image
+from torchvision.transforms.functional import to_tensor
 
 class PascalVOCSegmentation(VOCSegmentation):
 
@@ -121,6 +121,9 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         if self.augmentation:
             image, mask = self._transform(image, mask)
+
+        image = to_tensor(image)
+        mask = to_tensor(mask)
 
         # additional channel for background
         encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])

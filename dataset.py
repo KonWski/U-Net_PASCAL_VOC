@@ -140,6 +140,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             class_color_encoding = self.class_to_color[selected_class][1]
             class_pixels_indices = np.where(mask == class_color_encoding)
             print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
+            print(f"class_pixels_indices: {class_pixels_indices}")
             print(f"class_pixels_indices.shape: {class_pixels_indices}")
             # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
             encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1        

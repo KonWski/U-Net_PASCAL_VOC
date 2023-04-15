@@ -85,6 +85,8 @@ def train_model(
                 with torch.set_grad_enabled(state == 'train'):
                     
                     images, masks = batch
+                    print(f"images.shape: {images.shape}")
+                    print(f"masks.shape: {masks.shape}")
                     images, masks = split_image_mask(images, masks, splitted_mask_size, default_boundary)
 
                     images = images.to(device)

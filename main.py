@@ -14,7 +14,7 @@ def get_args():
     parser.add_argument('--selected_classes', type=str, help='classes seperated by commas')
 
     parser.add_argument('--splitted_mask_size', type=int, help='width and height of smaller piece of mask')
-    parser.add_argument('--default_boundary', type=int, help='padding size around cut out image piece')
+    parser.add_argument('--default_boundary_size', type=int, help='padding size around cut out image piece')
 
     args = vars(parser.parse_args())
     

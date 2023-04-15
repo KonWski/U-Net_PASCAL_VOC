@@ -13,6 +13,9 @@ def get_args():
     parser.add_argument('--year', type=str, help='year of Pascal VOC competition "2007" to "2012"')
     parser.add_argument('--selected_classes', type=str, help='classes seperated by commas')
 
+    parser.add_argument('--splitted_mask_size', type=int, help='width and height of smaller piece of mask')
+    parser.add_argument('--default_boundary', type=int, help='padding size around cut out image piece')
+
     args = vars(parser.parse_args())
     
     # parse str to boolean
@@ -47,4 +50,5 @@ if __name__ == "__main__":
     logging.info(f"Device: {device}")
 
     model = train_model(device, args["n_epochs"], args["checkpoints_dir"], args["checkpoints_dir"], 
-                        args["root_datasets_dir"], args["year"], args["selected_classes"])
+                        args["root_datasets_dir"], args["year"], args["selected_classes"],
+                        args["splitted_mask_size"], args["default_boundary_size"])

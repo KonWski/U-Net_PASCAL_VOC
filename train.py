@@ -15,7 +15,9 @@ def train_model(
         download_datasets: bool,
         root_datasets_dir: str,
         year: str,
-        selected_classes: List[str]
+        selected_classes: List[str],
+        splitted_mask_size: int,
+        default_boundary: int
     ):
     '''
     n_epochs: int
@@ -33,6 +35,10 @@ def train_model(
         or where dataset is already stored
     selected_classes: List[str]
         names of selected classes
+    splitted_mask_size: int
+        width and height of smaller piece of mask
+    default_boundary: int:
+        padding size around cut out image piece
     '''
 
     BATCH_SIZE = 1
@@ -79,7 +85,7 @@ def train_model(
                 with torch.set_grad_enabled(state == 'train'):
                     
                     images, masks = batch
-                    images, masks = split_image_mask(images, masks)
+                    images, masks = split_image_mask(images, masks, splitted_mask_size, default_boundary)
 
                     images = images.to(device)
                     masks = masks.to(device)

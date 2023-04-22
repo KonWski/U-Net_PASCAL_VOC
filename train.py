@@ -87,7 +87,16 @@ def train_model(
                     images, masks = batch
                     print(f"images.shape: {images.shape}")
                     print(f"masks.shape: {masks.shape}")
-                    images, masks = split_image_mask(images, masks, splitted_mask_size, default_boundary)
+
+                    image = images[0]
+                    mask = masks[0]
+                    print(f"image.shape: {image.shape}")
+                    print(f"mask.shape: {mask.shape}")
+
+                    image, mask = split_image_mask(image, mask, splitted_mask_size, default_boundary)
+
+                    images = torch.unsqueeze(image, 0)
+                    masks = torch.unsqueeze(mask, 0)
 
                     images = images.to(device)
                     masks = masks.to(device)

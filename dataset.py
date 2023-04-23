@@ -176,8 +176,10 @@ def split_image_mask(image: torch.Tensor, mask: torch.Tensor, splitted_mask_size
     output_submasks = []
     
     image_height = image.shape[1]
+    print(f"image_height: {image_height}")
     image_width = image.shape[2]
-    
+    print(f"image_width: {image_width}")
+
     # n_rows x n_cols is the number of output smaller parts
     n_rows = math.ceil(image_height / splitted_mask_size)
     print(f"n_rows: {n_rows}")
@@ -232,7 +234,7 @@ def split_image_mask(image: torch.Tensor, mask: torch.Tensor, splitted_mask_size
             sub_mask = mask[:, row_split_0:row_split_1, column_split_0:column_split_1]            
 
             # return to original dimensions order in piece of mask
-            sub_mask = sub_mask.view(1, 2, 0)
+            sub_mask = sub_mask.permute(1, 2, 0)
 
             print(f"sub_image before padding shape: {sub_image.shape}")
             print(f"sub_mask before padding shape: {sub_mask.shape}")

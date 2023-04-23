@@ -103,8 +103,8 @@ def train_model(
                     print(f"split_images.shape: {split_images.shape}")
                     print(f"split_masks.shape: {split_masks.shape}")
 
-                    images = torch.unsqueeze(image, 0)
-                    masks = torch.unsqueeze(mask, 0)
+                    # images = torch.unsqueeze(image, 0)
+                    # masks = torch.unsqueeze(mask, 0)
 
                     images = images.to(device)
                     masks = masks.to(device)

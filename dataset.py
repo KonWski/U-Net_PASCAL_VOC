@@ -130,6 +130,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
         encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
 
+        # TODO encoded_mask.shape: torch.Size([1, 500, 334, 2])
         print(f"encoded_mask.shape: {encoded_mask.shape}")
 
         # convert color encoding into channel encoding -
@@ -168,7 +169,7 @@ def split_image_mask(image: torch.Tensor, mask: torch.Tensor, splitted_mask_size
     '''
     
     # temporarily change order of dimensions in mask
-    mask = mask.view(2, 0, 1)
+    mask = mask.permute(2, 0, 1)
 
     # cut out parts of original image and mask
     output_subimages = []

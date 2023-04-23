@@ -121,8 +121,8 @@ def train_model(
                     # images = torch.unsqueeze(image, 0)
                     # masks = torch.unsqueeze(mask, 0)
 
-                    split_images = split_images.to(device)
-                    split_masks = split_masks.to(device)
+                    # split_images = split_images.to(device)
+                    # split_masks = split_masks.to(device)
                     optimizer.zero_grad()
 
                     # calculate loss

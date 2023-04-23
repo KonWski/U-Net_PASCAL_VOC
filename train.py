@@ -97,11 +97,11 @@ def train_model(
 
                     split_images, split_masks = split_image_mask(image, mask, splitted_mask_size, default_boundary)
 
-                    split_images = torch.stack(split_images)
-                    split_masks = torch.stack(split_masks)
+                    split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
+                    split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
 
-                    # print(f"split_images.shape: {split_images.shape}")
-                    # print(f"split_masks.shape: {split_masks.shape}")
+                    print(f"split_images.shape: {split_images.shape}")
+                    print(f"split_masks.shape: {split_masks.shape}")
 
                     # images = torch.unsqueeze(image, 0)
                     # masks = torch.unsqueeze(mask, 0)

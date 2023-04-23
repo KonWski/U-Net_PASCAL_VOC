@@ -100,6 +100,7 @@ def train_model(
                     split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
                     split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
 
+                    print(split_images)
                     print(f"split_images.shape: {split_images.shape}")
                     print(f"split_masks.shape: {split_masks.shape}")
 

@@ -125,6 +125,9 @@ class PascalVOCSegmentation(VOCSegmentation):
         image = to_tensor(image)
         mask = to_tensor(mask)
 
+        print(f"torch.max(image): {torch.max(image)}")
+        print(f"torch.max(mask): {torch.max(mask)}")
+
         # additional channel for background
         print(f"mask.shape: {mask.shape}")
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])

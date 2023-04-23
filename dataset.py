@@ -171,6 +171,9 @@ def split_image_mask(image: torch.Tensor, mask: torch.Tensor, splitted_mask_size
     # temporarily change order of dimensions in mask
     mask = mask.permute(2, 0, 1)
 
+    print(f"split_image_mask method mask.shape: {mask.shape}")
+    print(f"split_image_mask method image.shape: {image.shape}")
+
     # cut out parts of original image and mask
     output_subimages = []
     output_submasks = []

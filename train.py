@@ -1,5 +1,5 @@
 from typing import List
-from dataset import PascalVOCSegmentation, split_image_mask
+from dataset import PascalVOCSegmentation
 import torch
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
@@ -96,21 +96,19 @@ def train_model(
 
                 with torch.set_grad_enabled(state == 'train'):
                     
-                    images, masks = batch
-                    # print(f"images.shape: {images.shape}")
-                    # print(f"masks.shape: {masks.shape}")
+                    split_images, split_masks = batch
+                    print(f"images.shape: {split_images.shape}")
+                    print(f"masks.shape: {split_images.shape}")
 
-                    image = images[0]
-                    mask = masks[0][0]
+                    split_images = split_images[0]
+                    split_masks = split_masks[0]
                     # TODO image.shape: torch.Size([3, 500, 334])
                     # print(f"image.shape: {image.shape}")
                     # TODO mask.shape: torch.Size([1, 500, 334, 2])
                     # print(f"mask.shape: {mask.shape}")
 
-                    split_images, split_masks = split_image_mask(image, mask, splitted_mask_size, default_boundary)
-
-                    split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
-                    split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
+                    # split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
+                    # split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
 
                     print(f"split_images.shape: {split_images.shape}")
                     print(f"split_masks.shape: {split_masks.shape}")

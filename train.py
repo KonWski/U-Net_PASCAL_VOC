@@ -106,15 +106,15 @@ def train_model(
                     # images = torch.unsqueeze(image, 0)
                     # masks = torch.unsqueeze(mask, 0)
 
-                    images = images.to(device)
-                    masks = masks.to(device)
+                    split_images = split_images.to(device)
+                    split_masks = split_masks.to(device)
                     optimizer.zero_grad()
 
                     # calculate loss
                     # TODO model output: (1, 1, 292, 292), (batch_n, n_classes, height, width)
-                    outputs = model(images).to(device)
+                    outputs = model(split_images).to(device)
                     print(f"outputs.shape: {outputs.shape}")
-                    loss = criterion(outputs, masks)
+                    loss = criterion(outputs, split_masks)
 
                     if state == "train":
                         loss.backward()

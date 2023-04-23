@@ -237,7 +237,7 @@ def split_image_mask(image: torch.Tensor, mask: torch.Tensor, splitted_mask_size
             sub_mask = mask[:, row_split_0:row_split_1, column_split_0:column_split_1]            
 
             # return to original dimensions order in piece of mask
-            sub_mask = sub_mask.permute(1, 2, 0)
+            # sub_mask = sub_mask.permute(1, 2, 0)
 
             print(f"sub_image before padding shape: {sub_image.shape}")
             print(f"sub_mask before padding shape: {sub_mask.shape}")

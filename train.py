@@ -62,6 +62,17 @@ def train_model(
     model = model.to(device)
     optimizer = Adam(model.parameters(), lr=1e-5)
 
+    param_size = 0
+    for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
+    
+    buffer_size = 0
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
+
+    model_size = round((param_size + buffer_size) / 1024**2, 2)
+    print(f"model_size: {model_size}")
+
     for epoch in range(n_epochs):
         
         checkpoint = {}

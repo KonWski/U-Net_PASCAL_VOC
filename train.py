@@ -113,6 +113,7 @@ def train_model(
                     # calculate loss
                     # TODO model output: (1, 1, 292, 292), (batch_n, n_classes, height, width)
                     outputs = model(images).to(device)
+                    print(f"outputs.shape: {outputs.shape}")
                     loss = criterion(outputs, masks)
 
                     if state == "train":

@@ -89,8 +89,10 @@ def train_model(
                     print(f"masks.shape: {masks.shape}")
 
                     image = images[0]
-                    mask = masks[0]
+                    mask = masks[0][0]
+                    # TODO image.shape: torch.Size([3, 500, 334])
                     print(f"image.shape: {image.shape}")
+                    # TODO mask.shape: torch.Size([1, 500, 334, 2])
                     print(f"mask.shape: {mask.shape}")
 
                     image, mask = split_image_mask(image, mask, splitted_mask_size, default_boundary)
@@ -103,6 +105,7 @@ def train_model(
                     optimizer.zero_grad()
 
                     # calculate loss
+                    # TODO model output: (1, 1, 292, 292), (batch_n, n_classes, height, width)
                     outputs = model(images).to(device)
                     loss = criterion(outputs, masks)
 

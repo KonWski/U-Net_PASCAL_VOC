@@ -107,8 +107,9 @@ def train_model(
                     # TODO mask.shape: torch.Size([1, 500, 334, 2])
                     # print(f"mask.shape: {mask.shape}")
 
-                    split_images = torch.stack(split_images)
-                    split_masks = torch.stack(split_masks)
+                    # first element because loader creates unnecessarily one element batch
+                    split_images = torch.stack(split_images[0])
+                    split_masks = torch.stack(split_masks[0])
 
                     # split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
                     # split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]

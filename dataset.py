@@ -268,10 +268,4 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         split_image, split_mask = self._split_image_mask(image, encoded_mask)
 
-        debug_split_image = torch.stack(split_image)
-        debug_split_mask = torch.stack(split_mask)
-
-        print(f"debug_split_image: {debug_split_image.shape}")
-        print(f"debug_split_mask: {debug_split_mask.shape}")
-
         return split_image, split_mask

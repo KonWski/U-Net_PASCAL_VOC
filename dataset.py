@@ -259,7 +259,8 @@ class PascalVOCSegmentation(VOCSegmentation):
 
             # array empty if no pixels belong to specified class
             if class_pixels_indices[0].size > 0:
-                encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1        
+                # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
+                encoded_mask[class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
 
         # split images and masks to smaller parts
         print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")

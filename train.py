@@ -96,9 +96,9 @@ def train_model(
 
                 with torch.set_grad_enabled(state == 'train'):
                     
-                    split_images, split_masks = batch
-                    print(f"type(split_images): {type(split_images)}")
-                    print(f"Example image shape: {split_images[0].shape}")
+                    split_image, split_mask = batch
+                    print(f"type(split_images): {type(split_image)}")
+                    print(f"Example image shape: {split_image[0].shape}")
                     # print(f"images.shape: {split_images.shape}")
                     # print(f"masks.shape: {split_images.shape}")
 
@@ -110,17 +110,20 @@ def train_model(
                     # print(f"mask.shape: {mask.shape}")
 
                     # first element because loader creates unnecessarily one element batch
-                    split_images = torch.stack(split_images[0])
-                    split_masks = torch.stack(split_masks[0])
+                    split_image = [img_piece[0] for img_piece in split_image]
+                    split_mask = [mask_piece[0] for mask_piece in split_mask]
+
+                    split_image = torch.stack(split_image)
+                    split_mask = torch.stack(split_mask)
 
                     # split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
                     # split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
 
-                    print(f"split_images.shape: {split_images.shape}")
-                    print(f"split_masks.shape: {split_masks.shape}")
+                    print(f"split_images.shape: {split_image.shape}")
+                    print(f"split_masks.shape: {split_mask.shape}")
 
-                    print(f"split_images.size: {(split_images.element_size() * split_images.nelement()) / 1000000000}")
-                    print(f"split_masks.size: {(split_masks.element_size() * split_masks.nelement()) / 1000000000}")
+                    print(f"split_images.size: {(split_image.element_size() * split_image.nelement()) / 1000000000}")
+                    print(f"split_masks.size: {(split_mask.element_size() * split_mask.nelement()) / 1000000000}")
 
                     # images = torch.unsqueeze(image, 0)
                     # masks = torch.unsqueeze(mask, 0)
@@ -131,9 +134,9 @@ def train_model(
 
                     # calculate loss
                     # TODO model output: (1, 1, 292, 292), (batch_n, n_classes, height, width)
-                    outputs = model(split_images).to(device)
+                    outputs = model(split_image).to(device)
                     print(f"outputs.shape: {outputs.shape}")
-                    loss = criterion(outputs, split_masks)
+                    loss = criterion(outputs, split_mask)
 
                     if state == "train":
                         loss.backward()

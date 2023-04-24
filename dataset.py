@@ -262,6 +262,8 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         # split images and masks to smaller parts
         print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
+        print(f"Before _split_image_mask image.shape: {image.shape}")
+
         split_image, split_mask = self._split_image_mask(image, encoded_mask)
         
         return split_image, split_mask

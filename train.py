@@ -97,18 +97,18 @@ def train_model(
                 with torch.set_grad_enabled(state == 'train'):
                     
                     split_images, split_masks = batch
-                    print(f"images.shape: {split_images.shape}")
-                    print(f"masks.shape: {split_images.shape}")
+                    # print(f"images.shape: {split_images.shape}")
+                    # print(f"masks.shape: {split_images.shape}")
 
-                    split_images = split_images[0]
-                    split_masks = split_masks[0]
+                    # split_images = split_images[0]
+                    # split_masks = split_masks[0]
                     # TODO image.shape: torch.Size([3, 500, 334])
                     # print(f"image.shape: {image.shape}")
                     # TODO mask.shape: torch.Size([1, 500, 334, 2])
                     # print(f"mask.shape: {mask.shape}")
 
-                    # split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
-                    # split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
+                    split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
+                    split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
 
                     print(f"split_images.shape: {split_images.shape}")
                     print(f"split_masks.shape: {split_masks.shape}")

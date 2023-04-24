@@ -53,7 +53,7 @@ def train_model(
                                      default_boundary, False, download_datasets)
     test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
 
-    n_classes = len(selected_classes)
+    n_classes = len(selected_classes) + 1
     len_trainset = len(trainset)
     len_testset = len(testset)
 
@@ -135,7 +135,8 @@ def train_model(
                     # calculate loss
                     # TODO model output: (1, 1, 292, 292), (batch_n, n_classes, height, width)
                     outputs = model(split_image).to(device)
-                    print(f"outputs.shape: {outputs.shape}")
+                    print(f"Before criterion outputs.shape: {outputs.shape}")
+                    print(f"Before criterion split_mask.shape: {split_mask.shape}")
                     loss = criterion(outputs, split_mask)
 
                     if state == "train":

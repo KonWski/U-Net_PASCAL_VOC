@@ -97,6 +97,7 @@ def train_model(
                 with torch.set_grad_enabled(state == 'train'):
                     
                     split_images, split_masks = batch
+                    print(f"Example image shape: {split_images[0].shape}")
                     # print(f"images.shape: {split_images.shape}")
                     # print(f"masks.shape: {split_images.shape}")
 

@@ -209,8 +209,8 @@ class PascalVOCSegmentation(VOCSegmentation):
                 sub_image = F.pad(sub_image, padding_img)
                 sub_mask = F.pad(sub_mask, padding_mask)
                 
-                # print(f"sub_image after padding shape: {sub_image.shape}")
-                # print(f"sub_mask after padding shape: {sub_mask.shape}")            
+                print(f"sub_image after padding shape: {sub_image.shape}")
+                print(f"sub_mask after padding shape: {sub_mask.shape}")            
                 
                 # collect next pieces of image and mask part
                 output_subimages.append(sub_image)

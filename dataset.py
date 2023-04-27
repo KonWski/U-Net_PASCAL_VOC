@@ -224,6 +224,9 @@ class PascalVOCSegmentation(VOCSegmentation):
         image = cv2.imread(self.images[idx])
         mask = cv2.imread(self.masks[idx])
 
+        image = to_tensor(image)
+        mask = to_tensor(mask)
+
         print(f"image.shape: {image.shape}")
         print(f"mask.shape: {mask.shape}")
 
@@ -232,9 +235,6 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         if self.augmentation:
             image, mask = self._transform(image, mask)
-
-        image = to_tensor(image)
-        mask = to_tensor(mask)
 
         # print(f"torch.max(image): {torch.max(image)}")
         # print(f"torch.max(mask): {torch.max(mask)}")

@@ -161,7 +161,7 @@ def train_model(
 
             logging.info(f"Epoch: {epoch}, state: {state}, loss: {epoch_loss}")
 
-        if checkpoint["test_loss"] < best_test_loss:
+        if checkpoint["test_loss"] < best_test_loss and 1==2:
             
             # update lowest test loss
             best_test_loss = checkpoint["test_loss"]

@@ -46,7 +46,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         download: bool
             download dataset from repo
         '''
-        super().__init__(root, year, image_set, download, transforms=transforms)
+        super().__init__(root, year, image_set, download)
         self.selected_classes = selected_classes
         self.splitted_mask_size = splitted_mask_size
         self.default_boundary = default_boundary        
@@ -227,8 +227,8 @@ class PascalVOCSegmentation(VOCSegmentation):
         image = Image.open(self.images[idx])
         mask = Image.open(self.masks[idx])
 
-        # if self.augmentation:
-        #     image, mask = self._transform(image, mask)
+        if self.augmentation:
+            image, mask = self._transform(image, mask)
 
         image = to_tensor(image)
         mask = to_tensor(mask)

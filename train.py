@@ -55,6 +55,7 @@ def train_model(
 
     n_classes = len(selected_classes) + 1
     len_trainset = len(trainset)
+    print(f"len_trainset: {len_trainset}")
     len_testset = len(testset)
     best_test_loss = float("inf")
 

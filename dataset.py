@@ -246,7 +246,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         print(f"encoded_mask.shape: {encoded_mask.shape}")
 
         # information if selected class was found in the picture
-        any_selected_class_found = False
+        no_selected_classes_found = True
 
         # convert color encoding into channel encoding -
         # - each channel refers to specific class
@@ -264,7 +264,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             if class_pixels_indices[0].size > 0:
                 # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
                 encoded_mask[class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
-                any_selected_class_found = True
+                no_selected_classes_found = False
 
         # split images and masks to smaller parts
         print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
@@ -272,4 +272,4 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         split_image, split_mask = self._split_image_mask(image, encoded_mask)
 
-        return split_image, split_mask, any_selected_class_found
+        return split_image, split_mask, no_selected_classes_found

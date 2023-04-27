@@ -96,8 +96,13 @@ def train_model(
 
                 with torch.set_grad_enabled(state == 'train'):
                     
-                    split_image, split_mask, classes_found = batch
-                    print(f"classes_found: {classes_found}")
+                    split_image, split_mask, no_selected_classes_found = batch
+
+                    # run only on images where at least one selected class was found
+                    if no_selected_classes_found.item():
+                        break
+
+                    print(f"no_selected_classes_found: {no_selected_classes_found}")
                     print(f"type(split_images): {type(split_image)}")
                     print(f"Example image shape: {split_image[0].shape}")
                     # print(f"images.shape: {split_images.shape}")

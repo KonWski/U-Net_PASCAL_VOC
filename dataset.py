@@ -233,8 +233,8 @@ class PascalVOCSegmentation(VOCSegmentation):
         image = to_tensor(image)
         mask = to_tensor(mask)
 
-        print(f"torch.max(image): {torch.max(image)}")
-        print(f"torch.max(mask): {torch.max(mask)}")
+        # print(f"torch.max(image): {torch.max(image)}")
+        # print(f"torch.max(mask): {torch.max(mask)}")
 
         # additional channel for background
         print(f"mask.shape: {mask.shape}")
@@ -254,6 +254,9 @@ class PascalVOCSegmentation(VOCSegmentation):
             
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
+            print(f"class_color_encoding: {class_color_encoding}")
+            print(f"class_color_encoding.shape: {class_color_encoding.shape}")
+
             class_pixels_indices = np.where(mask == class_color_encoding)
             print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
             print(f"class_pixels_indices: {class_pixels_indices}")

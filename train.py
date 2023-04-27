@@ -56,6 +56,7 @@ def train_model(
     n_classes = len(selected_classes) + 1
     len_trainset = len(trainset)
     len_testset = len(testset)
+    best_test_loss = float("inf")
 
     # model
     model = uNetPascalVOC(max_depth_level=4, n_classes=n_classes)
@@ -102,7 +103,7 @@ def train_model(
                     if no_selected_classes_found.item():
                         break
 
-                    print(f"no_selected_classes_found: {no_selected_classes_found}")
+                    print(f"no_selected_classes_found: {no_selected_classes_found.item()}")
                     print(f"type(split_images): {type(split_image)}")
                     print(f"Example image shape: {split_image[0].shape}")
                     # print(f"images.shape: {split_images.shape}")

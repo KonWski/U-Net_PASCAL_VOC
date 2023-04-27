@@ -227,8 +227,8 @@ class PascalVOCSegmentation(VOCSegmentation):
         print(f"image.shape: {image.shape}")
         print(f"mask.shape: {mask.shape}")
 
-        image = Image.open(self.images[idx])
-        mask = Image.open(self.masks[idx])
+        # image = Image.open(self.images[idx])
+        # mask = Image.open(self.masks[idx])
 
         if self.augmentation:
             image, mask = self._transform(image, mask)

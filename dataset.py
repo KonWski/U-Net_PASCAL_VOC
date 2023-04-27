@@ -209,8 +209,8 @@ class PascalVOCSegmentation(VOCSegmentation):
                 sub_image = F.pad(sub_image, padding_img)
                 sub_mask = F.pad(sub_mask, padding_mask)
                 
-                print(f"sub_image after padding shape: {sub_image.shape}")
-                print(f"sub_mask after padding shape: {sub_mask.shape}")            
+                # print(f"sub_image after padding shape: {sub_image.shape}")
+                # print(f"sub_mask after padding shape: {sub_mask.shape}")            
                 
                 # collect next pieces of image and mask part
                 output_subimages.append(sub_image)
@@ -245,6 +245,9 @@ class PascalVOCSegmentation(VOCSegmentation):
         # TODO encoded_mask.shape: torch.Size([1, 500, 334, 2])
         print(f"encoded_mask.shape: {encoded_mask.shape}")
 
+        # information if selected class was found in the picture
+        any_selected_class_found = False
+
         # convert color encoding into channel encoding -
         # - each channel refers to specific class
         for selected_class in self.selected_classes:
@@ -261,6 +264,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             if class_pixels_indices[0].size > 0:
                 # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
                 encoded_mask[class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
+                any_selected_class_found = True
 
         # split images and masks to smaller parts
         print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
@@ -268,4 +272,4 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         split_image, split_mask = self._split_image_mask(image, encoded_mask)
 
-        return split_image, split_mask
+        return split_image, split_mask, any_selected_class_found

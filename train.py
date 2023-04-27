@@ -104,7 +104,7 @@ def train_model(
 
                     # run only on images where at least one selected class was found
                     if no_selected_classes_found.item():
-                        break
+                        continue
 
                     print(f"no_selected_classes_found: {no_selected_classes_found.item()}")
                     print(f"type(split_images): {type(split_image)}")

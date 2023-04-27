@@ -221,8 +221,11 @@ class PascalVOCSegmentation(VOCSegmentation):
 
     def __getitem__(self, idx):
         
-        # image = cv2.imread(self.images[idx])
-        # mask = cv2.imread(self.masks[idx])
+        image = cv2.imread(self.images[idx])
+        mask = cv2.imread(self.masks[idx])
+
+        print(f"image.shape: {image.shape}")
+        print(f"mask.shape: {mask.shape}")
 
         image = Image.open(self.images[idx])
         mask = Image.open(self.masks[idx])

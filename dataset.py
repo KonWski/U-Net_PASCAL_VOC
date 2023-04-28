@@ -221,27 +221,21 @@ class PascalVOCSegmentation(VOCSegmentation):
 
     def __getitem__(self, idx):
         
-        image = cv2.imread(self.images[idx])
+        image = to_tensor(cv2.imread(self.images[idx]))
         mask = cv2.imread(self.masks[idx])
         print(f"np.unique(mask before cvt): {np.unique(mask)}")
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
         print(f"np.unique(mask after cvt): {np.unique(mask)}")
         print(f"type(mask): {type(mask)}")
         
-        image = to_tensor(image)
-        mask = to_tensor(mask)
-
         print(f"image.shape: {image.shape}")
         print(f"mask.shape: {mask.shape}")
 
         # image = Image.open(self.images[idx])
         # mask = Image.open(self.masks[idx])
 
-        if self.augmentation:
-            image, mask = self._transform(image, mask)
-
-        print(f"torch.max(image): {torch.max(image)}")
-        print(f"torch.max(mask): {torch.max(mask)}")
+        # print(f"torch.max(image): {torch.max(image)}")
+        # print(f"torch.max(mask): {torch.max(mask)}")
 
         # additional channel for background
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
@@ -277,6 +271,9 @@ class PascalVOCSegmentation(VOCSegmentation):
         # split images and masks to smaller parts
         print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
         print(f"Before _split_image_mask image.shape: {image.shape}")
+
+        if self.augmentation:
+            image, encoded_mask = self._transform(image, encoded_mask)
 
         split_image, split_mask = self._split_image_mask(image, encoded_mask)
 

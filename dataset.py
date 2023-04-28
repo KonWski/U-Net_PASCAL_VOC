@@ -134,32 +134,32 @@ class PascalVOCSegmentation(VOCSegmentation):
         # temporarily change order of dimensions in mask
         mask = mask.permute(2, 0, 1)
 
-        # print(f"split_image_mask method mask.shape: {mask.shape}")
-        # print(f"split_image_mask method image.shape: {image.shape}")
+        print(f"split_image_mask method mask.shape: {mask.shape}")
+        print(f"split_image_mask method image.shape: {image.shape}")
 
         # cut out parts of original image and mask
         output_subimages = []
         output_submasks = []
         
         image_height = image.shape[1]
-        # print(f"image_height: {image_height}")
+        print(f"image_height: {image_height}")
         image_width = image.shape[2]
-        # print(f"image_width: {image_width}")
+        print(f"image_width: {image_width}")
 
         # n_rows x n_cols is the number of output smaller parts
         n_rows = math.ceil(image_height / self.splitted_mask_size)
-        # print(f"n_rows: {n_rows}")
+        print(f"n_rows: {n_rows}")
         n_cols = math.ceil(image_width / self.splitted_mask_size)
-        # print(f"n_cols: {n_cols}")
+        print(f"n_cols: {n_cols}")
 
         for n_row in range(n_rows):
             
             # upper and lower border of mask/image piece
-            # print(f"n_row: {n_row}")
+            print(f"n_row: {n_row}")
             row_split_0 = n_row * self.splitted_mask_size
-            # print(f"row_split_0: {row_split_0}")
+            print(f"row_split_0: {row_split_0}")
             row_split_1 = (n_row + 1) * self.splitted_mask_size
-            # print(f"row_split_1: {row_split_1}")
+            print(f"row_split_1: {row_split_1}")
             
             # corner case - lower border exceeds original image
             if row_split_1 > image_height:
@@ -172,11 +172,11 @@ class PascalVOCSegmentation(VOCSegmentation):
             for n_column in range(n_cols):
                 
                 # left and right border of mask/image piece
-                # print(f"n_column: {n_column}")
+                print(f"n_column: {n_column}")
                 column_split_0 = n_column * self.splitted_mask_size
-                # print(f"column_split_0: {column_split_0}")
+                print(f"column_split_0: {column_split_0}")
                 column_split_1 = (n_column + 1) * self.splitted_mask_size
-                # print(f"column_split_1: {column_split_1}")
+                print(f"column_split_1: {column_split_1}")
                 
                 # corner case - right border exceeds original image
                 if column_split_1 > image_width:
@@ -191,9 +191,9 @@ class PascalVOCSegmentation(VOCSegmentation):
                 padding size (left, right, top, bottom)
                 '''
                 padding_img = (self.default_boundary, padding_img_right, self.default_boundary, padding_img_bottom)
-                # print(f"padding_img: {padding_img}")
+                print(f"padding_img: {padding_img}")
                 padding_mask = (0, padding_mask_right, 0, padding_mask_bottom)
-                # print(f"padding_mask: {padding_mask}")
+                print(f"padding_mask: {padding_mask}")
 
                 # extract subimage and submask from input image and mask
                 sub_image = image[:, row_split_0:row_split_1, column_split_0:column_split_1]
@@ -202,15 +202,15 @@ class PascalVOCSegmentation(VOCSegmentation):
                 # return to original dimensions order in piece of mask
                 # sub_mask = sub_mask.permute(1, 2, 0)
 
-                # print(f"sub_image before padding shape: {sub_image.shape}")
-                # print(f"sub_mask before padding shape: {sub_mask.shape}")
+                print(f"sub_image before padding shape: {sub_image.shape}")
+                print(f"sub_mask before padding shape: {sub_mask.shape}")
                 
                 # add padding for image and mask piece
                 sub_image = F.pad(sub_image, padding_img)
                 sub_mask = F.pad(sub_mask, padding_mask)
                 
-                # print(f"sub_image after padding shape: {sub_image.shape}")
-                # print(f"sub_mask after padding shape: {sub_mask.shape}")            
+                print(f"sub_image after padding shape: {sub_image.shape}")
+                print(f"sub_mask after padding shape: {sub_mask.shape}")            
                 
                 # collect next pieces of image and mask part
                 output_subimages.append(sub_image)

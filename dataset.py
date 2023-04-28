@@ -238,6 +238,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         # print(f"torch.max(mask): {torch.max(mask)}")
 
         # additional channel for background
+        # [319, 500, 2]
         encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
         # encoded_mask = torch.zeros([mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
@@ -265,7 +266,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             # array empty if no pixels belong to specified class
             if class_pixels_indices[0].size > 0:
                 # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
-                encoded_mask[class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
+                encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
                 no_selected_classes_found = False
 
         # split images and masks to smaller parts

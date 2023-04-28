@@ -223,7 +223,9 @@ class PascalVOCSegmentation(VOCSegmentation):
         
         image = cv2.imread(self.images[idx])
         mask = cv2.imread(self.masks[idx])
+        print(f"np.unique(mask before cvt): {np.unique(mask)}")
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
+        print(f"np.unique(mask after cvt): {np.unique(mask)}")
         print(f"type(mask): {type(mask)}")
         
         image = to_tensor(image)

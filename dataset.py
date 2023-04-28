@@ -223,6 +223,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         
         image = cv2.imread(self.images[idx])
         mask = cv2.imread(self.masks[idx])
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
 
         image = to_tensor(image)
         mask = to_tensor(mask)
@@ -236,18 +237,16 @@ class PascalVOCSegmentation(VOCSegmentation):
         if self.augmentation:
             image, mask = self._transform(image, mask)
 
-        # print(f"torch.max(image): {torch.max(image)}")
-        # print(f"torch.max(mask): {torch.max(mask)}")
+        print(f"torch.max(image): {torch.max(image)}")
+        print(f"torch.max(mask): {torch.max(mask)}")
 
         # additional channel for background
-        print(f"mask.shape: {mask.shape}")
-        print(f"torch.unique(mask): {torch.unique(mask)}")
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
         encoded_mask = torch.zeros([mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
 
         # TODO encoded_mask.shape: torch.Size([1, 500, 334, 2])
-        print(f"encoded_mask.shape: {encoded_mask.shape}")
+        # print(f"encoded_mask.shape: {encoded_mask.shape}")
 
         # information if selected class was found in the picture
         no_selected_classes_found = True

@@ -238,9 +238,9 @@ class PascalVOCSegmentation(VOCSegmentation):
         # print(f"torch.max(mask): {torch.max(mask)}")
 
         # additional channel for background
-        # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
+        encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
-        encoded_mask = torch.zeros([mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
+        # encoded_mask = torch.zeros([mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
 
         # TODO encoded_mask.shape: torch.Size([1, 500, 334, 2])
         # print(f"encoded_mask.shape: {encoded_mask.shape}")

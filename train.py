@@ -155,6 +155,7 @@ def train_model(
 
                 # statistics
                 running_loss += loss.item()
+                print(f"running_loss: {running_loss}")
 
             # save and log epoch statistics
             epoch_loss = round(running_loss / len_dataset, 2)

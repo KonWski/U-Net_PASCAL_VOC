@@ -108,7 +108,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         # class_name -> (id, color in mask)
         self.class_to_color = {selected_class: (id, self._color_map[self._classes_names.index(selected_class)]) 
                                for id, selected_class in enumerate(self.selected_classes)}
-
+        print(self.class_to_color)
 
     def _transform(self, image, mask):
 

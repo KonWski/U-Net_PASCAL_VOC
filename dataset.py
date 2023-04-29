@@ -259,6 +259,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             # print(f"class_color_encoding: {class_color_encoding}")
 
             class_pixels_indices = np.where(mask == class_color_encoding)
+            print(f"np.unique(class_pixels_indices): {np.unique(class_pixels_indices)}")
             # print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
             # print(f"class_pixels_indices: {class_pixels_indices}")
             # print(f"class_pixels_indices.shape: {class_pixels_indices}")

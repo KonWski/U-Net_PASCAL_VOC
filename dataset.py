@@ -253,6 +253,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         # - each channel refers to specific class
         for selected_class in self.selected_classes:
             
+            print(f"selected_class: {selected_class}")
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
             # print(f"class_color_encoding: {class_color_encoding}")

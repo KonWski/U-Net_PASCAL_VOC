@@ -223,13 +223,13 @@ class PascalVOCSegmentation(VOCSegmentation):
         
         image = to_tensor(cv2.imread(self.images[idx]))
         mask = cv2.imread(self.masks[idx])
-        print(f"np.unique(mask before cvt): {np.unique(mask)}")
+        # print(f"np.unique(mask before cvt): {np.unique(mask)}")
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
-        print(f"np.unique(mask after cvt): {np.unique(mask)}")
-        print(f"type(mask): {type(mask)}")
+        # print(f"np.unique(mask after cvt): {np.unique(mask)}")
+        # print(f"type(mask): {type(mask)}")
         
-        print(f"image.shape: {image.shape}")
-        print(f"mask.shape: {mask.shape}")
+        # print(f"image.shape: {image.shape}")
+        # print(f"mask.shape: {mask.shape}")
 
         # image = Image.open(self.images[idx])
         # mask = Image.open(self.masks[idx])
@@ -255,12 +255,12 @@ class PascalVOCSegmentation(VOCSegmentation):
             
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
-            print(f"class_color_encoding: {class_color_encoding}")
+            # print(f"class_color_encoding: {class_color_encoding}")
 
             class_pixels_indices = np.where(mask == class_color_encoding)
-            print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
-            print(f"class_pixels_indices: {class_pixels_indices}")
-            print(f"class_pixels_indices.shape: {class_pixels_indices}")
+            # print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
+            # print(f"class_pixels_indices: {class_pixels_indices}")
+            # print(f"class_pixels_indices.shape: {class_pixels_indices}")
             # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
 
             # array empty if no pixels belong to specified class
@@ -269,13 +269,18 @@ class PascalVOCSegmentation(VOCSegmentation):
                 encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
                 no_selected_classes_found = False
 
-        # split images and masks to smaller parts
-        print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
-        print(f"Before _split_image_mask image.shape: {image.shape}")
 
-        if self.augmentation:
-            image, encoded_mask = self._transform(image, encoded_mask)
+        # print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
+        # print(f"Before _split_image_mask image.shape: {image.shape}")
+        if self.image_set == "train" and no_selected_classes_found:
+            split_image, split_mask = None, None
 
-        split_image, split_mask = self._split_image_mask(image, encoded_mask)
+        else:
+
+            if self.augmentation:
+                image, encoded_mask = self._transform(image, encoded_mask)
+            
+            # split images and masks to smaller parts
+            split_image, split_mask = self._split_image_mask(image, encoded_mask)
 
         return split_image, split_mask, no_selected_classes_found

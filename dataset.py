@@ -47,7 +47,6 @@ class PascalVOCSegmentation(VOCSegmentation):
             download dataset from repo
         '''
         super().__init__(root, year, image_set, download)
-        self.selected_classes = selected_classes + ["background"]
         self.splitted_mask_size = splitted_mask_size
         self.default_boundary = default_boundary        
         self.augmentation = augmentation
@@ -75,6 +74,8 @@ class PascalVOCSegmentation(VOCSegmentation):
             "tv/monitor",
             "border"
         ]
+
+        self.selected_classes = self._classes_names if selected_classes[0] == "all" else selected_classes
 
         all_classes_available = all([selected_class in self._classes_names for selected_class in self.selected_classes])
         assert all_classes_available, "Not all specified classes are available"
@@ -277,7 +278,7 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         # print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
         # print(f"Before _split_image_mask image.shape: {image.shape}")
-        if self.image_set == "train" and no_selected_classes_found:
+        if no_selected_classes_found:
             split_image, split_mask = torch.Tensor(), torch.Tensor()
 
         else:

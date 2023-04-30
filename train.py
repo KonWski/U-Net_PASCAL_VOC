@@ -54,9 +54,6 @@ def train_model(
     test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
 
     n_classes = len(selected_classes) + 1
-    len_trainset = len(trainset)
-    # print(f"len_trainset: {len_trainset}")
-    len_testset = len(testset)
     best_test_loss = float("inf")
 
     # model
@@ -78,8 +75,9 @@ def train_model(
     for epoch in range(n_epochs):
         
         checkpoint = {}
+        n_imgs_loss = 0
 
-        for state, loader, len_dataset in zip(["train", "test"], [train_loader, test_loader], [len_trainset, len_testset]):
+        for state, loader in zip(["train", "test"], [train_loader, test_loader]):
 
             # calculated parameters
             running_loss = 0.0
@@ -104,7 +102,9 @@ def train_model(
 
                     # run only on images where at least one selected class was found
                     if no_selected_classes_found.item():
-                        continue
+                        continue                        
+                    
+                    n_imgs_loss += len(split_image)
 
                     # print(f"no_selected_classes_found: {no_selected_classes_found.item()}")
                     # print(f"type(split_images): {type(split_image)}")
@@ -158,7 +158,7 @@ def train_model(
                 print(f"running_loss: {running_loss}")
 
             # save and log epoch statistics
-            epoch_loss = round(running_loss / len_dataset, 2)
+            epoch_loss = round(running_loss / n_imgs_loss, 2)
 
             # save stats for potential checkpoint
             checkpoint[f"{state}_loss"] = epoch_loss

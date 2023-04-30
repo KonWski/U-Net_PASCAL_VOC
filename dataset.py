@@ -47,7 +47,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             download dataset from repo
         '''
         super().__init__(root, year, image_set, download)
-        self.selected_classes = selected_classes
+        self.selected_classes = selected_classes + ["background"]
         self.splitted_mask_size = splitted_mask_size
         self.default_boundary = default_boundary        
         self.augmentation = augmentation
@@ -108,7 +108,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         # class_name -> (id, color in mask)
         self.class_to_color = {selected_class: (id, self._color_map[self._classes_names.index(selected_class)]) 
                                for id, selected_class in enumerate(self.selected_classes)}
-        print(self.class_to_color)
+        # print(self.class_to_color)
 
     def _transform(self, image, mask):
 
@@ -253,19 +253,19 @@ class PascalVOCSegmentation(VOCSegmentation):
         # - each channel refers to specific class
         for selected_class in self.selected_classes:
             
-            print(f"selected_class: {selected_class}")
+            # print(f"selected_class: {selected_class}")
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
-            print(f"class_color_encoding: {class_color_encoding}")
+            # print(f"class_color_encoding: {class_color_encoding}")
 
             class_pixels_indices = np.all(mask == class_color_encoding, -1)
             found_class = np.any(class_pixels_indices)
             class_pixels_indices = torch.Tensor(np.where(class_pixels_indices, 1, 0))
 
-            print(f"np.unique(mask): {np.unique(mask)}")
+            # print(f"np.unique(mask): {np.unique(mask)}")
             # print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
             # print(f"class_pixels_indices: {class_pixels_indices}")
-            print(f"class_pixels_indices.shape: {class_pixels_indices}")
+            # print(f"class_pixels_indices.shape: {class_pixels_indices}")
             # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
 
             # array empty if no pixels belong to specified class
@@ -273,8 +273,7 @@ class PascalVOCSegmentation(VOCSegmentation):
                 # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
                 encoded_mask[:, :, channel_id] = class_pixels_indices
                 # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
-                no_selected_classes_found = False
-
+                no_selected_classes_found = False if selected_class != "background" else no_selected_classes_found
 
         # print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
         # print(f"Before _split_image_mask image.shape: {image.shape}")

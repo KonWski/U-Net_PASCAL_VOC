@@ -55,7 +55,7 @@ def train_model(
 
     n_classes = len(selected_classes) + 1
     len_trainset = len(trainset)
-    print(f"len_trainset: {len_trainset}")
+    # print(f"len_trainset: {len_trainset}")
     len_testset = len(testset)
     best_test_loss = float("inf")
 
@@ -64,16 +64,16 @@ def train_model(
     model = model.to(device)
     optimizer = Adam(model.parameters(), lr=1e-5)
 
-    param_size = 0
-    for param in model.parameters():
-        param_size += param.nelement() * param.element_size()
+    # param_size = 0
+    # for param in model.parameters():
+    #     param_size += param.nelement() * param.element_size()
     
-    buffer_size = 0
-    for buffer in model.buffers():
-        buffer_size += buffer.nelement() * buffer.element_size()
+    # buffer_size = 0
+    # for buffer in model.buffers():
+    #     buffer_size += buffer.nelement() * buffer.element_size()
 
-    model_size = round((param_size + buffer_size) / 1024**2, 2)
-    print(f"model_size: {model_size}")
+    # model_size = round((param_size + buffer_size) / 1024**2, 2)
+    # print(f"model_size: {model_size}")
 
     for epoch in range(n_epochs):
         
@@ -106,9 +106,9 @@ def train_model(
                     if no_selected_classes_found.item():
                         continue
 
-                    print(f"no_selected_classes_found: {no_selected_classes_found.item()}")
-                    print(f"type(split_images): {type(split_image)}")
-                    print(f"Example image shape: {split_image[0].shape}")
+                    # print(f"no_selected_classes_found: {no_selected_classes_found.item()}")
+                    # print(f"type(split_images): {type(split_image)}")
+                    # print(f"Example image shape: {split_image[0].shape}")
                     # print(f"images.shape: {split_images.shape}")
                     # print(f"masks.shape: {split_images.shape}")
 
@@ -129,11 +129,11 @@ def train_model(
                     # split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
                     # split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
 
-                    print(f"split_images.shape: {split_image.shape}")
-                    print(f"split_masks.shape: {split_mask.shape}")
+                    # print(f"split_images.shape: {split_image.shape}")
+                    # print(f"split_masks.shape: {split_mask.shape}")
 
-                    print(f"split_images.size: {(split_image.element_size() * split_image.nelement()) / 1000000000}")
-                    print(f"split_masks.size: {(split_mask.element_size() * split_mask.nelement()) / 1000000000}")
+                    # print(f"split_images.size: {(split_image.element_size() * split_image.nelement()) / 1000000000}")
+                    # print(f"split_masks.size: {(split_mask.element_size() * split_mask.nelement()) / 1000000000}")
 
                     # images = torch.unsqueeze(image, 0)
                     # masks = torch.unsqueeze(mask, 0)

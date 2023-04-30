@@ -239,7 +239,7 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         # additional channel for background
         # [319, 500, 2]
-        encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes) + 1])
+        encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes)])
         # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
         # encoded_mask = torch.zeros([mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
 

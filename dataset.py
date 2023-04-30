@@ -256,19 +256,22 @@ class PascalVOCSegmentation(VOCSegmentation):
             print(f"selected_class: {selected_class}")
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
-            # print(f"class_color_encoding: {class_color_encoding}")
+            print(f"class_color_encoding: {class_color_encoding}")
 
-            class_pixels_indices = np.where(mask == class_color_encoding)
-            print(f"np.unique(class_pixels_indices): {np.unique(class_pixels_indices)}")
+            class_pixels_indices = np.all(mask == class_color_encoding, -1)
+            found_class = np.any(class_pixels_indices)
+            class_pixels_indices = np.where(class_pixels_indices, 1, 0)
+            print(f"np.unique(mask): {np.unique(mask)}")
             # print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
             # print(f"class_pixels_indices: {class_pixels_indices}")
             # print(f"class_pixels_indices.shape: {class_pixels_indices}")
             # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
 
             # array empty if no pixels belong to specified class
-            if class_pixels_indices[0].size > 0:
+            if found_class:
                 # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
-                encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
+                encoded_mask[:, :, channel_id] = class_pixels_indices
+                # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
                 no_selected_classes_found = False
 
 

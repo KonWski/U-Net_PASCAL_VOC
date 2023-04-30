@@ -30,6 +30,10 @@ def get_args():
     # parse str to list (selected_classes)
     args["selected_classes"] = args["selected_classes"].split(",")
 
+    # extend selected_classes with background
+    if "background" not in args["selected_classes"] and args["selected_classes"][0] != "all":
+        args["selected_classes"].append("background")
+
     # log input parameters
     logging.info(8*"-")
     logging.info("PARAMETERS")

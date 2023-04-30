@@ -4,10 +4,9 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.optim import Adam
-from model import uNetPascalVOC
+from model import uNetPascalVOC, save_checkpoint
 import logging
 from datetime import datetime
-import sys
 
 def train_model(
         device, 
@@ -53,7 +52,7 @@ def train_model(
                                      default_boundary, False, download_datasets)
     test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
 
-    n_classes=len(trainset.selected_classes)
+    n_classes = len(trainset.selected_classes)
     best_test_loss = float("inf")
 
     # model
@@ -165,20 +164,20 @@ def train_model(
 
             logging.info(f"Epoch: {epoch}, state: {state}, loss: {epoch_loss}")
 
-        if checkpoint["test_loss"] < best_test_loss and 1==2:
+        if checkpoint["test_loss"] < best_test_loss:
             
             # update lowest test loss
             best_test_loss = checkpoint["test_loss"]
 
             # save model to checkpoint
             checkpoint["epoch"] = epoch
-            checkpoint["n_classes"] = n_classes
-            checkpoint["selected_classes"] = ",".join(n_classes)
+            checkpoint["selected_classes"] = selected_classes
+            checkpoint["max_depth_level"] = 4
             checkpoint["model_state_dict"] = model.state_dict()
             checkpoint["save_dttm"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             checkpoint_path = f"{checkpoints_dir}/uNetPascalVOC"
-            # save_checkpoint(checkpoint, checkpoint_path)
+            save_checkpoint(checkpoint, checkpoint_path)
 
         else:
             logging.info(8*"-")

@@ -278,7 +278,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         # print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
         # print(f"Before _split_image_mask image.shape: {image.shape}")
         if self.image_set == "train" and no_selected_classes_found:
-            split_image, split_mask = None, None
+            split_image, split_mask = torch.Tensor(), torch.Tensor()
 
         else:
 

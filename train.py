@@ -53,10 +53,11 @@ def train_model(
                                      default_boundary, False, download_datasets)
     test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
 
+    n_classes=len(trainset.selected_classes)
     best_test_loss = float("inf")
 
     # model
-    model = uNetPascalVOC(max_depth_level=4, n_classes=len(trainset.selected_classes))
+    model = uNetPascalVOC(max_depth_level=4, n_classes=n_classes)
     model = model.to(device)
     optimizer = Adam(model.parameters(), lr=1e-5)
 

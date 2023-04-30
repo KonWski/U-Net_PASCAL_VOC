@@ -260,11 +260,12 @@ class PascalVOCSegmentation(VOCSegmentation):
 
             class_pixels_indices = np.all(mask == class_color_encoding, -1)
             found_class = np.any(class_pixels_indices)
-            class_pixels_indices = np.where(class_pixels_indices, 1, 0)
+            class_pixels_indices = torch.Tensor(np.where(class_pixels_indices, 1, 0))
+
             print(f"np.unique(mask): {np.unique(mask)}")
             # print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
             # print(f"class_pixels_indices: {class_pixels_indices}")
-            # print(f"class_pixels_indices.shape: {class_pixels_indices}")
+            print(f"class_pixels_indices.shape: {class_pixels_indices}")
             # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
 
             # array empty if no pixels belong to specified class

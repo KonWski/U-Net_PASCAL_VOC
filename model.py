@@ -111,7 +111,59 @@ class uNetPascalVOC(nn.Module):
         x = self.final_layer(x)
 
         return x
-    
+
+
+def save_checkpoint(checkpoint: dict, checkpoint_path: str):
+    '''
+    saves checkpoint on given checkpoint_path
+    '''
+    torch.save(checkpoint, checkpoint_path)
+
+    logging.info(8*"-")
+    logging.info(f"Saved model to checkpoint: {checkpoint_path}")
+    logging.info(f"Epoch: {checkpoint['epoch']}")
+    logging.info(8*"-")
+
+
+def load_checkpoint(checkpoint_path: str):
+    '''
+    loads model checkpoint from given path
+
+    Parameters
+    ----------
+    checkpoint_path : str
+        Path to checkpoint
+
+    Notes
+    -----
+    checkpoint: dict
+                parameters retrieved from training process i.e.:
+                - last finished number of epoch
+                - depth level of model
+                - selected classes
+                - model_state_dict
+                - save time
+    '''
+    checkpoint = torch.load(checkpoint_path)
+
+    # initiate model
+    model = uNetPascalVOC(checkpoint["max_depth_level"], len(checkpoint["selected_classes"]))
+
+    # load parameters from checkpoint
+    model.load_state_dict(checkpoint["model_state_dict"])
+
+    # print loaded parameters
+    logging.info(f"Loaded model from checkpoint: {checkpoint_path}")
+    logging.info(f"Epoch: {checkpoint['epoch']}")
+    logging.info(f"Save dttm: {checkpoint['save_dttm']}")
+    logging.info(f"Selected classes: {checkpoint['selected_classes']}")
+    logging.info(f"Depth level of model: {checkpoint['max_depth_level']}")
+    logging.info(f"Test loss: {checkpoint['test_loss']}")
+
+    logging.info(8*"-")
+
+    return model, checkpoint
+
 
 def test_model(height: int, width: int, n_channels: int, max_depth_level: int, n_classes: int):
     

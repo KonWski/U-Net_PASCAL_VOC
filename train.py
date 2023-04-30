@@ -143,9 +143,12 @@ def train_model(
 
                     # calculate loss
                     # TODO model output: (1, 1, 292, 292), (batch_n, n_classes, height, width)
+                    
+                    split_image = split_image.to(device)
                     outputs = model(split_image).to(device)
                     # print(f"Before criterion outputs.shape: {outputs.shape}")
                     # print(f"Before criterion split_mask.shape: {split_mask.shape}")
+                    split_mask = split_mask.to(device)
                     loss = criterion(outputs, split_mask)
 
                     if state == "train":

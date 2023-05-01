@@ -99,7 +99,7 @@ def train_model(
 
                 with torch.set_grad_enabled(state == 'train'):
                     
-                    split_image, split_mask, no_selected_classes_found = batch
+                    split_image, split_mask, no_selected_classes_found, original_image_size = batch
 
                     # run only on images where at least one selected class was found
                     if no_selected_classes_found.item():

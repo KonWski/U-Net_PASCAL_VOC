@@ -52,7 +52,9 @@ def train_model(
                                      default_boundary, False, download_datasets)
     test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
 
-    n_classes = len(trainset.selected_classes)
+    # update selected classes in case of 'all'
+    selected_classes = trainset.selected_classes
+    n_classes = len(selected_classes)
     best_test_loss = float("inf")
 
     # model

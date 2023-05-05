@@ -53,6 +53,6 @@ if __name__ == "__main__":
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     logging.info(f"Device: {device}")
 
-    model = train_model(device, args["n_epochs"], args["checkpoints_dir"], args["checkpoints_dir"], 
+    model = train_model(device, args["n_epochs"], args["checkpoints_dir"], args["download_datasets"], 
                         args["root_datasets_dir"], args["year"], args["selected_classes"],
                         args["splitted_mask_size"], args["default_boundary_size"])

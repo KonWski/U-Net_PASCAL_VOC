@@ -222,7 +222,9 @@ class PascalVOCSegmentation(VOCSegmentation):
 
     def __getitem__(self, idx):
         
-        image = to_tensor(cv2.imread(self.images[idx]))
+        image_vis = cv2.imread(self.images[idx])
+        image = to_tensor(image_vis)
+        # image = to_tensor(cv2.imread(self.images[idx]))
         mask = cv2.imread(self.masks[idx])
         # print(f"np.unique(mask before cvt): {np.unique(mask)}")
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
@@ -289,4 +291,4 @@ class PascalVOCSegmentation(VOCSegmentation):
             # split images and masks to smaller parts
             split_image, split_mask = self._split_image_mask(image, encoded_mask)
 
-        return image, split_image, split_mask, no_selected_classes_found
+        return image_vis, split_image, split_mask, no_selected_classes_found

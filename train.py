@@ -95,7 +95,7 @@ def train_model(
 
             for id, batch in enumerate(loader, 0):
                 
-                print(f"id: {id}")
+                # print(f"id: {id}")
 
                 with torch.set_grad_enabled(state == 'train'):
                     
@@ -159,7 +159,7 @@ def train_model(
 
                 # statistics
                 running_loss += loss.item()
-                print(f"running_loss: {running_loss}")
+                # print(f"running_loss: {running_loss}")
 
             # save and log epoch statistics
             epoch_loss = round(running_loss / n_imgs_loss, 2)

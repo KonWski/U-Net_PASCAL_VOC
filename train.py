@@ -76,12 +76,12 @@ def train_model(
     for epoch in range(n_epochs):
         
         checkpoint = {}
-        n_imgs_loss = 0
 
         for state, loader in zip(["train", "test"], [train_loader, test_loader]):
 
             # calculated parameters
             running_loss = 0.0
+            n_imgs_loss = 0
 
             if n_classes == 2:
                 criterion = BCEWithLogitsLoss()
@@ -105,7 +105,7 @@ def train_model(
                     if no_selected_classes_found.item():
                         continue                        
                     
-                    n_imgs_loss += len(split_image)
+                    n_imgs_loss += 1
 
                     # print(f"no_selected_classes_found: {no_selected_classes_found.item()}")
                     # print(f"type(split_images): {type(split_image)}")
@@ -162,7 +162,7 @@ def train_model(
                 # print(f"running_loss: {running_loss}")
 
             # save and log epoch statistics
-            epoch_loss = round(running_loss / n_imgs_loss, 2)
+            epoch_loss = round(running_loss / n_imgs_loss, 5)
 
             # save stats for potential checkpoint
             checkpoint[f"{state}_loss"] = epoch_loss

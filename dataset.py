@@ -157,48 +157,68 @@ class PascalVOCSegmentation(VOCSegmentation):
             
             # upper and lower border of mask/image piece
             # print(f"n_row: {n_row}")
-            row_split_0 = n_row * self.splitted_mask_size
-            # print(f"row_split_0: {row_split_0}")
-            row_split_1 = (n_row + 1) * self.splitted_mask_size
-            # print(f"row_split_1: {row_split_1}")
             
+            row_split_mask_0 = n_row * self.splitted_mask_size
+            # print(f"row_split_0: {row_split_0}")
+            row_split_img_0 = min(0, row_split_mask_0 - self.default_boundary)
+            # print(f"row_split_img_0: {row_split_image_0}")
+
+            row_split_mask_1 = (n_row + 1) * self.splitted_mask_size
+            # print(f"row_split_1: {row_split_1}")
+
+            row_split_img_1 = min(image_height, row_split_mask_1 + self.default_boundary)
+            print(f"row_split_image_1: {row_split_img_1}")
+
+            padding_img_top = abs(row_split_mask_0 - self.default_boundary) - row_split_img_0
+            padding_img_bottom = (row_split_mask_1 + self.default_boundary) - row_split_img_1
+
             # corner case - lower border exceeds original image
-            if row_split_1 > image_height:
-                padding_img_bottom = self.default_boundary + (row_split_1 - image_height)
-                padding_mask_bottom = row_split_1 - image_height
+            if row_split_mask_1 > image_height:
+                # padding_img_bottom = self.default_boundary + (row_split_mask_1 - image_height)
+                padding_mask_bottom = row_split_mask_1 - image_height
             else:
-                padding_img_bottom = self.default_boundary
+                # padding_img_bottom = self.default_boundary
                 padding_mask_bottom = 0
             
             for n_column in range(n_cols):
                 
                 # left and right border of mask/image piece
                 # print(f"n_column: {n_column}")
-                column_split_0 = n_column * self.splitted_mask_size
+                column_split_mask_0 = n_column * self.splitted_mask_size
                 # print(f"column_split_0: {column_split_0}")
-                column_split_1 = (n_column + 1) * self.splitted_mask_size
+                column_split_img_0 = min(0, column_split_mask_0 - self.default_boundary)
+                # print(f"column_split_img_0: {column_split_img_0}")
+
+                column_split_mask_1 = (n_column + 1) * self.splitted_mask_size
                 # print(f"column_split_1: {column_split_1}")
-                
+                column_split_img_1 = min(image_width, column_split_mask_1 + self.default_boundary)
+                # print(f"column_split_img_0: {column_split_img_0}")
+
+                padding_img_left = abs(column_split_mask_0 - self.default_boundary) - column_split_img_0
+                padding_img_right = (column_split_mask_1 + self.default_boundary) - column_split_img_1
+
                 # corner case - right border exceeds original image
-                if column_split_1 > image_width:
-                    padding_img_right = self.default_boundary + (column_split_1 - image_width)
-                    padding_mask_right = column_split_1 - image_width
+                if column_split_mask_1 > image_width:
+                    # padding_img_right = self.default_boundary + (column_split_mask_1 - image_width)
+                    padding_mask_right = column_split_mask_1 - image_width
                 else:
-                    padding_img_right = self.default_boundary
+                    # padding_img_right = self.default_boundary
                     padding_mask_right = 0
                 
                 '''
                 padding size for image and mask pieces
                 padding size (left, right, top, bottom)
                 '''
-                padding_img = (self.default_boundary, padding_img_right, self.default_boundary, padding_img_bottom)
+                # padding_img = (self.default_boundary, padding_img_right, self.default_boundary, padding_img_bottom)
+                padding_img = (padding_img_left, padding_img_right, padding_img_top, padding_img_bottom)
                 # print(f"padding_img: {padding_img}")
                 padding_mask = (0, padding_mask_right, 0, padding_mask_bottom)
                 # print(f"padding_mask: {padding_mask}")
 
                 # extract subimage and submask from input image and mask
-                sub_image = image[:, row_split_0:row_split_1, column_split_0:column_split_1]
-                sub_mask = mask[:, row_split_0:row_split_1, column_split_0:column_split_1]            
+                # sub_image = image[:, row_split_mask_0:row_split_mask_1, column_split_0:column_split_1]
+                sub_image = image[:, row_split_img_0:row_split_img_1, column_split_img_0:column_split_img_1]
+                sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
 
                 # return to original dimensions order in piece of mask
                 # sub_mask = sub_mask.permute(1, 2, 0)

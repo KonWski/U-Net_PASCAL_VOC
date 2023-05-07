@@ -161,7 +161,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             row_split_mask_0 = n_row * self.splitted_mask_size
             # print(f"row_split_0: {row_split_0}")
             row_split_img_0 = max(0, row_split_mask_0 - self.default_boundary)
-            # print(f"row_split_img_0: {row_split_image_0}")
+            print(f"row_split_img_0: {row_split_image_0}")
 
             row_split_mask_1 = (n_row + 1) * self.splitted_mask_size
             # print(f"row_split_1: {row_split_1}")
@@ -171,6 +171,8 @@ class PascalVOCSegmentation(VOCSegmentation):
 
             padding_img_top = abs(row_split_mask_0 - self.default_boundary) - row_split_img_0
             padding_img_bottom = (row_split_mask_1 + self.default_boundary) - row_split_img_1
+            print(f"padding_img_top: {padding_img_top}")
+            print(f"padding_img_bottom: {padding_img_bottom}")
 
             # corner case - lower border exceeds original image
             if row_split_mask_1 > image_height:
@@ -196,6 +198,9 @@ class PascalVOCSegmentation(VOCSegmentation):
 
                 padding_img_left = abs(column_split_mask_0 - self.default_boundary) - column_split_img_0
                 padding_img_right = (column_split_mask_1 + self.default_boundary) - column_split_img_1
+                print(f"padding_img_left: {padding_img_left}")
+                print(f"padding_img_right: {padding_img_right}")
+
 
                 # corner case - right border exceeds original image
                 if column_split_mask_1 > image_width:

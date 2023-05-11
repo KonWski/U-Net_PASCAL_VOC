@@ -1,5 +1,5 @@
 from torch import nn, Tensor, concat
-from torch.nn import ConvTranspose2d, MaxPool2d, Conv2d
+from torch.nn import ConvTranspose2d, MaxPool2d, Conv2d, BatchNorm2d, ReLU
 import math
 import torch
 import logging
@@ -14,15 +14,24 @@ class uNetContractingBlock(nn.Module):
         self.depth_level = depth_level
         self.input_channels = 3 if depth_level == 0 else int(64 * math.pow(2, depth_level - 1))
         self.output_channels = 64 * int(math.pow(2, depth_level))
+        self.activation_function = ReLU()
 
         self.conv1 = Conv2d(self.input_channels, self.output_channels, 3, bias=False)
+        self.batchnorm1 = BatchNorm2d(self.output_channels)
         self.conv2 = Conv2d(self.output_channels, self.output_channels, 3, bias=False)
+        self.batchnorm2 = BatchNorm2d(self.output_channels)
         self.maxpool = MaxPool2d(2, stride=2)
     
     def forward(self, x: Tensor):
 
         x_coppied = self.conv1(x)
+        x_coppied = self.batchnorm1(x_coppied)
+        x_coppied = self.activation_function(x_coppied)
+
         x_coppied = self.conv2(x_coppied)
+        x_coppied = self.batchnorm2(x_coppied)
+        x_coppied = self.activation_function(x_coppied)
+
         x_pooled = self.maxpool(x_coppied)
 
         return x_coppied, x_pooled
@@ -38,14 +47,22 @@ class uNetBottleneck(nn.Module):
         self.input_channels = int(64 * math.pow(2, depth_level - 1))
         self.mid_channels = int(64 * math.pow(2, depth_level))
         self.output_channels = self.mid_channels
+        self.activation_function = ReLU()
 
         self.conv1 = Conv2d(self.input_channels, self.mid_channels, 3, bias=False)
+        self.batchnorm1 = BatchNorm2d(self.mid_channels)
         self.conv2 = Conv2d(self.mid_channels, self.mid_channels, 3, bias=False)
+        self.batchnorm2 = BatchNorm2d(self.mid_channels)
 
     def forward(self, x: Tensor):
 
         x = self.conv1(x)
+        x = self.batchnorm1(x)
+        x = self.activation_function(x)
+
         x = self.conv2(x)
+        x = self.batchnorm2(x)
+        x = self.activation_function(x)
 
         return x
 
@@ -60,18 +77,23 @@ class uNetExpandingBlock(nn.Module):
         self.input_channels = int(64 * math.pow(2, depth_level + 1))
         self.mid_channels = int(64 * math.pow(2, depth_level))
         self.output_channels = self.mid_channels
+        self.activation_function = ReLU()        
         
         self.upsample = ConvTranspose2d(self.input_channels, self.input_channels, 3, 2)
         self.conv1 = Conv2d(self.input_channels, self.mid_channels, 2, bias=False)
+        self.batchnorm1 = BatchNorm2d(self.mid_channels)
         self.conv2 = Conv2d(self.input_channels, self.mid_channels, 3, bias=False)
+        self.batchnorm2 = BatchNorm2d(self.mid_channels)
         self.conv3 = Conv2d(self.mid_channels, self.output_channels, 3, bias=False)
-
+        self.batchnorm3 = BatchNorm2d(self.output_channels)
 
     def forward(self, x_previous_layer: Tensor, x_coppied: Tensor):
         
         # upsampling
         x = self.upsample(x_previous_layer)
         x = self.conv1(x)
+        x = self.batchnorm1(x)
+        x = self.activation_function(x)
 
         # concatenation
         x_cropped = x_coppied[:, :, :x.shape[2], :x.shape[3]]
@@ -79,7 +101,12 @@ class uNetExpandingBlock(nn.Module):
 
         # convolution part
         x = self.conv2(x)
+        x = self.batchnorm2(x)
+        x = self.activation_function(x)
+
         x = self.conv3(x)
+        x = self.batchnorm3(x)
+        x = self.activation_function(x)
 
         return x
 

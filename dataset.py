@@ -224,6 +224,10 @@ class PascalVOCSegmentation(VOCSegmentation):
                 # sub_image = image[:, row_split_mask_0:row_split_mask_1, column_split_0:column_split_1]
                 sub_image = image[:, row_split_img_0:row_split_img_1, column_split_img_0:column_split_img_1]
                 sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
+                
+                # set part of mask that was extended by padding as background
+                sub_mask[0, :, -padding_mask_right:] = torch.ones([sub_mask.shape[1], padding_mask_right])
+                sub_mask[0, -padding_mask_bottom:, :] = torch.ones([padding_mask_bottom, sub_mask.shape[2]])
 
                 # return to original dimensions order in piece of mask
                 # sub_mask = sub_mask.permute(1, 2, 0)

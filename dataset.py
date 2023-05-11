@@ -226,6 +226,10 @@ class PascalVOCSegmentation(VOCSegmentation):
                 sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
                 
                 # set part of mask that was extended by padding as background
+                print(f"sub_mask.shape: {sub_mask.shape}")
+                print(f"padding_mask_right: {padding_mask_right}")
+                print(f"padding_mask_bottom: {padding_mask_bottom}")
+
                 if padding_mask_right > 0:
                     sub_mask[0, :, -padding_mask_right:] = torch.ones([sub_mask.shape[1], padding_mask_right])
                 

@@ -225,17 +225,6 @@ class PascalVOCSegmentation(VOCSegmentation):
                 sub_image = image[:, row_split_img_0:row_split_img_1, column_split_img_0:column_split_img_1]
                 sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
                 
-                # set part of mask that was extended by padding as background
-                print(f"sub_mask.shape: {sub_mask.shape}")
-                print(f"padding_mask_right: {padding_mask_right}")
-                print(f"padding_mask_bottom: {padding_mask_bottom}")
-
-                if padding_mask_right > 0:
-                    sub_mask[0, :, -padding_mask_right:] = torch.ones([sub_mask.shape[1], padding_mask_right])
-                
-                if padding_mask_bottom > 0:
-                    sub_mask[0, -padding_mask_bottom:, :] = torch.ones([padding_mask_bottom, sub_mask.shape[2]])
-
                 # return to original dimensions order in piece of mask
                 # sub_mask = sub_mask.permute(1, 2, 0)
 
@@ -245,7 +234,19 @@ class PascalVOCSegmentation(VOCSegmentation):
                 # add padding for image and mask piece
                 sub_image = F.pad(sub_image, padding_img)
                 sub_mask = F.pad(sub_mask, padding_mask)
+
+                # set part of mask that was extended by padding as background
+                # print(f"sub_mask.shape: {sub_mask.shape}")
+                # print(f"padding_mask_right: {padding_mask_right}")
+                # print(f"padding_mask_bottom: {padding_mask_bottom}")
+
+                if padding_mask_right > 0:
+                    sub_mask[0, :, -padding_mask_right:] = torch.ones([sub_mask.shape[1], padding_mask_right])
                 
+                if padding_mask_bottom > 0:
+                    sub_mask[0, -padding_mask_bottom:, :] = torch.ones([padding_mask_bottom, sub_mask.shape[2]])
+
+
                 # print(f"sub_image after padding shape: {sub_image.shape}")
                 # print(f"sub_mask after padding shape: {sub_mask.shape}")            
                 

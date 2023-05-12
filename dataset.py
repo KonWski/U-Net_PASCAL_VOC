@@ -212,17 +212,17 @@ class PascalVOCSegmentation(VOCSegmentation):
                 '''
                 # padding_img = (self.default_boundary, padding_img_right, self.default_boundary, padding_img_bottom)
                 padding_img = (padding_img_left, padding_img_right, padding_img_top, padding_img_bottom)
-                print(f"padding_img: {padding_img}")
+                # print(f"padding_img: {padding_img}")
                 padding_mask = (0, padding_mask_right, 0, padding_mask_bottom)
-                print(f"padding_mask: {padding_mask}")
+                # print(f"padding_mask: {padding_mask}")
 
                 # extract subimage and submask from input image and mask
                 # sub_image = image[:, row_split_mask_0:row_split_mask_1, column_split_0:column_split_1]
                 sub_image = image[:, row_split_img_0:row_split_img_1, column_split_img_0:column_split_img_1]
                 sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
 
-                print(f"Image, height: {row_split_img_0}:{row_split_img_1}, width: {column_split_img_0}:{column_split_img_1}")
-                print(f"Mask, height: {row_split_mask_0}:{row_split_mask_1}, width: {column_split_mask_0}:{column_split_mask_1}")
+                # print(f"Image, height: {row_split_img_0}:{row_split_img_1}, width: {column_split_img_0}:{column_split_img_1}")
+                # print(f"Mask, height: {row_split_mask_0}:{row_split_mask_1}, width: {column_split_mask_0}:{column_split_mask_1}")
 
                 # return to original dimensions order in piece of mask
                 # sub_mask = sub_mask.permute(1, 2, 0)

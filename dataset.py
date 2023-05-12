@@ -159,9 +159,8 @@ class PascalVOCSegmentation(VOCSegmentation):
             # print(f"n_row: {n_row}")
             
             row_split_mask_0 = n_row * self.splitted_mask_size
-            # print(f"row_split_0: {row_split_0}")
-            row_split_img_0 = max(0, row_split_mask_0 - self.default_boundary)
-            # print(f"row_split_img_0: {row_split_img_0}")
+            # row_split_img_0 = max(0, row_split_mask_0 - self.default_boundary)
+            row_split_img_0 = row_split_mask_0
 
             row_split_mask_1 = (n_row + 1) * self.splitted_mask_size
             # print(f"row_split_1: {row_split_1}")
@@ -185,9 +184,9 @@ class PascalVOCSegmentation(VOCSegmentation):
             for n_column in range(n_cols):
                 
                 # left and right border of mask/image piece
-                # print(f"n_column: {n_column}")
                 column_split_mask_0 = n_column * self.splitted_mask_size
-                column_split_img_0 = max(0, column_split_mask_0 - self.default_boundary)
+                # column_split_img_0 = max(0, column_split_mask_0 - self.default_boundary)
+                column_split_img_0 = column_split_mask_0
 
                 column_split_mask_1 = (n_column + 1) * self.splitted_mask_size
                 column_split_img_1 = min(image_width, column_split_mask_1 + self.default_boundary)

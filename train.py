@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.optim import Adam
-from model import uNetPascalVOC, save_checkpoint
+from model import uNetPascalVOC, save_checkpoint, load_checkpoint
 import logging
 from datetime import datetime
 
@@ -17,7 +17,8 @@ def train_model(
         year: str,
         selected_classes: List[str],
         splitted_mask_size: int,
-        default_boundary: int
+        default_boundary: int,
+        load_model: bool
     ):
     '''
     n_epochs: int
@@ -62,18 +63,13 @@ def train_model(
     model = model.to(device)
     optimizer = Adam(model.parameters(), lr=1e-5)
 
-    # param_size = 0
-    # for param in model.parameters():
-    #     param_size += param.nelement() * param.element_size()
-    
-    # buffer_size = 0
-    # for buffer in model.buffers():
-    #     buffer_size += buffer.nelement() * buffer.element_size()
+    if load_model:
+        model, optimizer, last_epoch = load_checkpoint(model, optimizer, f"{checkpoints_dir}/uNetPascalVOC")
+        start_epoch = last_epoch + 1
+    else:
+        start_epoch = 0
 
-    # model_size = round((param_size + buffer_size) / 1024**2, 2)
-    # print(f"model_size: {model_size}")
-
-    for epoch in range(n_epochs):
+    for epoch in range(start_epoch, n_epochs):
         
         checkpoint = {}
 

@@ -59,8 +59,8 @@ def train_model(
     best_test_loss = float("inf")
 
     if load_model:
-        model, last_epoch = load_checkpoint(f"{checkpoints_dir}/uNetPascalVOC")
-        start_epoch = last_epoch + 1
+        model, loaded_checkpoint = load_checkpoint(f"{checkpoints_dir}/uNetPascalVOC")
+        start_epoch = loaded_checkpoint["epoch"] + 1
     else:
         model = uNetPascalVOC(max_depth_level=4, n_classes=n_classes)
         start_epoch = 0

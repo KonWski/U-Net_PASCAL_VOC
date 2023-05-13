@@ -58,16 +58,15 @@ def train_model(
     n_classes = len(selected_classes)
     best_test_loss = float("inf")
 
-    # model
-    model = uNetPascalVOC(max_depth_level=4, n_classes=n_classes)
-    model = model.to(device)
-    optimizer = Adam(model.parameters(), lr=1e-5)
-
     if load_model:
-        model, optimizer, last_epoch = load_checkpoint(model, optimizer, f"{checkpoints_dir}/uNetPascalVOC")
+        model, last_epoch = load_checkpoint(f"{checkpoints_dir}/uNetPascalVOC")
         start_epoch = last_epoch + 1
     else:
+        model = uNetPascalVOC(max_depth_level=4, n_classes=n_classes)
         start_epoch = 0
+
+    model = model.to(device)
+    optimizer = Adam(model.parameters(), lr=1e-5)
 
     for epoch in range(start_epoch, n_epochs):
         

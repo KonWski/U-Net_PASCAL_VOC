@@ -1,6 +1,6 @@
 from torchvision.datasets import VOCSegmentation
 from torchvision import transforms
-from torchvision.transforms.functional import vflip
+from torchvision.transforms.functional import hflip
 import cv2
 import numpy as np
 import torch
@@ -8,7 +8,6 @@ from typing import List
 import math
 import torch.nn.functional as F
 import random
-from PIL import Image
 from torchvision.transforms.functional import to_tensor
 
 class PascalVOCSegmentation(VOCSegmentation):
@@ -115,8 +114,8 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         # random vertical flip
         if random.random() > 0.5:
-            image = vflip(image)
-            mask = vflip(mask)
+            image = hflip(image)
+            mask = hflip(mask)
                     
         return image, mask
 
@@ -320,6 +319,9 @@ class PascalVOCSegmentation(VOCSegmentation):
             split_image, split_mask = torch.Tensor(), torch.Tensor()
 
         else:
+            
+            print(f"image shape: {image.shape}")
+            print(f"encoded_mask shape: {encoded_mask.shape}")
 
             if self.augmentation:
                 image, encoded_mask = self._transform(image, encoded_mask)

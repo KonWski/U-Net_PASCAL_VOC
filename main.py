@@ -14,13 +14,14 @@ def get_args():
     parser.add_argument('--selected_classes', type=str, help='classes seperated by commas')
     parser.add_argument('--splitted_mask_size', type=int, help='width and height of smaller piece of mask')
     parser.add_argument('--default_boundary_size', type=int, help='padding size around cut out image piece')
+    parser.add_argument('--initialize_model_weights', type=str, default="N", help='initialize model weights using normal distribiution')
     parser.add_argument('--load_model', type=str, default="N", help='Y -> continue learning using existing model and optimizer')
 
     args = vars(parser.parse_args())
     
     # parse str to boolean
     str_true = ["Y", "y", "Yes", "yes", "true", "True"]
-    bool_params = ["download_datasets", "load_model"]
+    bool_params = ["download_datasets", "load_model", "initialize_model_weights"]
     for param in bool_params:
         if args[param] in str_true:
             args[param] = True
@@ -56,4 +57,4 @@ if __name__ == "__main__":
     model = train_model(device, args["n_epochs"], args["checkpoints_dir"], args["download_datasets"], 
                         args["root_datasets_dir"], args["year"], args["selected_classes"],
                         args["splitted_mask_size"], args["default_boundary_size"],
-                        args["load_model"])
+                        args["initialize_model_weights"], args["load_model"])

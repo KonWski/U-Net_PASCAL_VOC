@@ -4,10 +4,11 @@ import math
 import torch
 import logging
 import argparse
+from torch.nn.init import normal_
 
 class uNetContractingBlock(nn.Module):
 
-    def __init__(self, depth_level: int):
+    def __init__(self, depth_level: int, inititialize_weights: bool = False):
 
         super().__init__()
 
@@ -21,6 +22,9 @@ class uNetContractingBlock(nn.Module):
         self.conv2 = Conv2d(self.output_channels, self.output_channels, 3, bias=False)
         self.batchnorm2 = BatchNorm2d(self.output_channels)
         self.maxpool = MaxPool2d(2, stride=2)
+
+        if inititialize_weights:
+            self.apply(self._init_model_weights)
     
     def forward(self, x: Tensor):
 
@@ -36,10 +40,13 @@ class uNetContractingBlock(nn.Module):
 
         return x_coppied, x_pooled
 
+    def _init_model_weights(self, module):
+        module.weight.data.normal_(mean=0.0, std=0.5)
+
 
 class uNetBottleneck(nn.Module):
 
-    def __init__(self, depth_level: int):
+    def __init__(self, depth_level: int, inititialize_weights: bool = False):
 
         super().__init__()
 
@@ -54,6 +61,9 @@ class uNetBottleneck(nn.Module):
         self.conv2 = Conv2d(self.mid_channels, self.mid_channels, 3, bias=False)
         self.batchnorm2 = BatchNorm2d(self.mid_channels)
 
+        if inititialize_weights:
+            self.apply(self._init_model_weights)
+
     def forward(self, x: Tensor):
 
         x = self.conv1(x)
@@ -66,10 +76,13 @@ class uNetBottleneck(nn.Module):
 
         return x
 
+    def _init_model_weights(self, module):
+        module.weight.data.normal_(mean=0.0, std=0.5)
+
 
 class uNetExpandingBlock(nn.Module):
 
-    def __init__(self, depth_level: int):
+    def __init__(self, depth_level: int, inititialize_weights: bool = False):
 
         super().__init__()
 
@@ -86,6 +99,10 @@ class uNetExpandingBlock(nn.Module):
         self.batchnorm2 = BatchNorm2d(self.mid_channels)
         self.conv3 = Conv2d(self.mid_channels, self.output_channels, 3, bias=False)
         self.batchnorm3 = BatchNorm2d(self.output_channels)
+
+        if inititialize_weights:
+            self.apply(self._init_model_weights)
+
 
     def forward(self, x_previous_layer: Tensor, x_coppied: Tensor):
         
@@ -110,18 +127,26 @@ class uNetExpandingBlock(nn.Module):
 
         return x
 
+    def _init_model_weights(self, module):
+        module.weight.data.normal_(mean=0.0, std=0.5)
+
 
 class uNetPascalVOC(nn.Module):
 
-    def __init__(self, max_depth_level: int, n_classes: int):
+    def __init__(self, max_depth_level: int, n_classes: int, inititialize_weights: bool = False):
 
         super().__init__()
         self.max_depth_level = max_depth_level
 
-        self.contracting_path = nn.ModuleList([uNetContractingBlock(depth_level) for depth_level in range(self.max_depth_level)])
-        self.bottleneck = uNetBottleneck(self.max_depth_level)
-        self.expanding_path = nn.ModuleList([uNetExpandingBlock(depth_level) for depth_level in reversed(range(self.max_depth_level))])
+        self.contracting_path = nn.ModuleList([uNetContractingBlock(depth_level, inititialize_weights) 
+                                               for depth_level in range(self.max_depth_level)])
+        self.bottleneck = uNetBottleneck(self.max_depth_level, inititialize_weights)
+        self.expanding_path = nn.ModuleList([uNetExpandingBlock(depth_level, inititialize_weights) 
+                                             for depth_level in reversed(range(self.max_depth_level))])
         self.final_layer = Conv2d(self.expanding_path[-1].output_channels, n_classes, 1, bias=False)
+
+        if inititialize_weights:
+            self.apply(self._init_model_weights)
 
     def forward(self, x: Tensor):
         
@@ -138,6 +163,9 @@ class uNetPascalVOC(nn.Module):
         x = self.final_layer(x)
 
         return x
+
+    def _init_model_weights(self, module):
+        module.weight.data.normal_(mean=0.0, std=0.5)
 
 
 def save_checkpoint(checkpoint: dict, checkpoint_path: str):

@@ -18,6 +18,7 @@ def train_model(
         selected_classes: List[str],
         splitted_mask_size: int,
         default_boundary: int,
+        initialize_model_weights: bool,
         load_model: bool
     ):
     '''
@@ -62,7 +63,7 @@ def train_model(
         model, loaded_checkpoint = load_checkpoint(f"{checkpoints_dir}/uNetPascalVOC")
         start_epoch = loaded_checkpoint["epoch"] + 1
     else:
-        model = uNetPascalVOC(max_depth_level=4, n_classes=n_classes)
+        model = uNetPascalVOC(4, n_classes, initialize_model_weights)
         start_epoch = 0
 
     model = model.to(device)

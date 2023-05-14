@@ -47,7 +47,7 @@ def train_model(
 
     # datasets and dataloaders
     trainset = PascalVOCSegmentation(f'{root_datasets_dir}/train/', year, "train", selected_classes, splitted_mask_size, 
-                                     default_boundary, False, download_datasets)
+                                     default_boundary, True, download_datasets)
     train_loader = DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
 
     testset = PascalVOCSegmentation(f'{root_datasets_dir}/test/', year, "test", selected_classes, splitted_mask_size,

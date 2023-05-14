@@ -1,5 +1,4 @@
 from torchvision.datasets import VOCSegmentation
-from torchvision import transforms
 from torchvision.transforms.functional import hflip
 import cv2
 import numpy as np
@@ -111,12 +110,18 @@ class PascalVOCSegmentation(VOCSegmentation):
         # print(self.class_to_color)
 
     def _transform(self, image, mask):
+        
+        # shape of mask before flip should look like this: (class_dim, height, width)
+        mask = mask.permute(2, 0, 1)
 
-        # random vertical flip
+        # random horizontal flip
         if random.random() > 0.5:
             image = hflip(image)
             mask = hflip(mask)
-                    
+        
+        # return to original dimensions order
+        mask = mask.permute(1, 2, 0)
+
         return image, mask
 
 

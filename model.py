@@ -145,7 +145,7 @@ class uNetPascalVOC(nn.Module):
                                              for depth_level in reversed(range(self.max_depth_level))])
         self.final_layer = Conv2d(self.expanding_path[-1].output_channels, n_classes, 1, bias=False)
 
-        if inititialize_weights:
+        if 1==1:
             self.apply(self._init_model_weights)
 
     def forward(self, x: Tensor):

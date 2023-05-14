@@ -134,7 +134,7 @@ class uNetExpandingBlock(nn.Module):
 class uNetPascalVOC(nn.Module):
 
     def __init__(self, max_depth_level: int, n_classes: int, inititialize_weights: bool = False):
-
+        inititialize_weights = False
         super().__init__()
         self.max_depth_level = max_depth_level
 

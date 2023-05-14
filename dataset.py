@@ -324,9 +324,6 @@ class PascalVOCSegmentation(VOCSegmentation):
             split_image, split_mask = torch.Tensor(), torch.Tensor()
 
         else:
-            
-            print(f"image shape: {image.shape}")
-            print(f"encoded_mask shape: {encoded_mask.shape}")
 
             if self.augmentation:
                 image, encoded_mask = self._transform(image, encoded_mask)

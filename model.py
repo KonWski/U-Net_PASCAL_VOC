@@ -166,7 +166,7 @@ class uNetPascalVOC(nn.Module):
 
     def _init_model_weights(self, module):
         print(f"modeule type: {type(module)}")
-        if isinstance(module, Conv2d) or isinstance(module, BatchNorm2d) or isinstance(module, ConvTranspose2d)
+        if isinstance(module, Conv2d) or isinstance(module, BatchNorm2d) or isinstance(module, ConvTranspose2d):
             module.weight.data.normal_(mean=0.0, std=0.5)
 
 

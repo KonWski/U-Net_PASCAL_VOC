@@ -8,6 +8,7 @@ import math
 import torch.nn.functional as F
 import random
 from torchvision.transforms.functional import to_tensor
+from torchvision import transforms
 
 class PascalVOCSegmentation(VOCSegmentation):
 
@@ -263,7 +264,15 @@ class PascalVOCSegmentation(VOCSegmentation):
     def __getitem__(self, idx):
         
         image_vis = cv2.imread(self.images[idx])
-        image = to_tensor(image_vis)
+        image_vis = cv2.cvtColor(image_vis, cv2.COLOR_BGR2RGB)
+        
+        transform_image = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+
+        image = transform_image(image_vis)
+
         # image = to_tensor(cv2.imread(self.images[idx]))
         mask = cv2.imread(self.masks[idx])
         # print(f"np.unique(mask before cvt): {np.unique(mask)}")

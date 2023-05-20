@@ -2,7 +2,7 @@ from typing import List
 from dataset import PascalVOCSegmentation
 import torch
 from torch.utils.data import DataLoader
-from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
+from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from model import uNetPascalVOC, save_checkpoint, load_checkpoint
 import logging
@@ -57,17 +57,19 @@ def train_model(
     # update selected classes in case of 'all'
     selected_classes = trainset.selected_classes
     n_classes = len(selected_classes)
-    best_test_loss = float("inf")
 
     if load_model:
-        model, loaded_checkpoint = load_checkpoint(f"{checkpoints_dir}/uNetPascalVOC")
+        model, optimizer, loaded_checkpoint = load_checkpoint(f"{checkpoints_dir}/uNetPascalVOC")
+        best_test_loss = min(float("inf"), loaded_checkpoint["test_loss"])
         start_epoch = loaded_checkpoint["epoch"] + 1
+
     else:
         model = uNetPascalVOC(4, n_classes, initialize_model_weights)
+        optimizer = Adam(model.parameters(), lr=1e-5)
+        best_test_loss = float("inf")
         start_epoch = 0
 
     model = model.to(device)
-    optimizer = Adam(model.parameters(), lr=1e-5)
 
     for epoch in range(start_epoch, n_epochs):
         
@@ -79,10 +81,7 @@ def train_model(
             running_loss = 0.0
             n_imgs_loss = 0
 
-            if n_classes == 2:
-                criterion = BCEWithLogitsLoss()
-            else:
-                criterion = CrossEntropyLoss()
+            criterion = CrossEntropyLoss()
 
             if state == "train":
                 model.train()
@@ -90,8 +89,6 @@ def train_model(
                 model.eval()
 
             for id, batch in enumerate(loader, 0):
-                
-                # print(f"id: {id}")
 
                 with torch.set_grad_enabled(state == 'train'):
                     
@@ -103,49 +100,17 @@ def train_model(
                     
                     n_imgs_loss += 1
 
-                    # print(f"no_selected_classes_found: {no_selected_classes_found.item()}")
-                    # print(f"type(split_images): {type(split_image)}")
-                    # print(f"Example image shape: {split_image[0].shape}")
-                    # print(f"images.shape: {split_images.shape}")
-                    # print(f"masks.shape: {split_images.shape}")
-
-                    # split_images = split_images[0]
-                    # split_masks = split_masks[0]
-                    # TODO image.shape: torch.Size([3, 500, 334])
-                    # print(f"image.shape: {image.shape}")
-                    # TODO mask.shape: torch.Size([1, 500, 334, 2])
-                    # print(f"mask.shape: {mask.shape}")
-
-                    # first element because loader creates unnecessarily one element batch
+                    # first element - loader creates one element batch
                     split_image = [img_piece[0] for img_piece in split_image]
                     split_mask = [mask_piece[0] for mask_piece in split_mask]
 
                     split_image = torch.stack(split_image)
                     split_mask = torch.stack(split_mask)
 
-                    # split_images = torch.stack(split_images).unsqueeze(dim=0)[0]
-                    # split_masks = torch.stack(split_masks).unsqueeze(dim=0)[0]
-
-                    # print(f"split_images.shape: {split_image.shape}")
-                    # print(f"split_masks.shape: {split_mask.shape}")
-
-                    # print(f"split_images.size: {(split_image.element_size() * split_image.nelement()) / 1000000000}")
-                    # print(f"split_masks.size: {(split_mask.element_size() * split_mask.nelement()) / 1000000000}")
-
-                    # images = torch.unsqueeze(image, 0)
-                    # masks = torch.unsqueeze(mask, 0)
-
-                    # split_images = split_images.to(device)
-                    # split_masks = split_masks.to(device)
                     optimizer.zero_grad()
-
-                    # calculate loss
-                    # TODO model output: (1, 1, 292, 292), (batch_n, n_classes, height, width)
                     
                     split_image = split_image.to(device)
                     outputs = model(split_image).to(device)
-                    # print(f"Before criterion outputs.shape: {outputs.shape}")
-                    # print(f"Before criterion split_mask.shape: {split_mask.shape}")
                     split_mask = split_mask.to(device)
                     loss = criterion(outputs, split_mask)
 
@@ -155,7 +120,6 @@ def train_model(
 
                 # statistics
                 running_loss += loss.item()
-                # print(f"running_loss: {running_loss}")
 
             # save and log epoch statistics
             epoch_loss = round(running_loss / n_imgs_loss, 5)
@@ -175,6 +139,7 @@ def train_model(
             checkpoint["selected_classes"] = selected_classes
             checkpoint["max_depth_level"] = 4
             checkpoint["model_state_dict"] = model.state_dict()
+            checkpoint["optimizer_state_dict"] = optimizer.state_dict()
             checkpoint["save_dttm"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             checkpoint_path = f"{checkpoints_dir}/uNetPascalVOC"

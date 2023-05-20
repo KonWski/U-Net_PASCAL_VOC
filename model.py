@@ -5,6 +5,7 @@ import torch
 import logging
 import argparse
 from torch.nn.init import normal_
+from torch.optim import Adam
 
 class uNetContractingBlock(nn.Module):
 
@@ -115,7 +116,7 @@ class uNetExpandingBlock(nn.Module):
 class uNetPascalVOC(nn.Module):
 
     def __init__(self, max_depth_level: int, n_classes: int, inititialize_weights: bool = False):
-        inititialize_weights = False
+
         super().__init__()
         self.max_depth_level = max_depth_level
 
@@ -182,11 +183,13 @@ def load_checkpoint(checkpoint_path: str):
     '''
     checkpoint = torch.load(checkpoint_path)
 
-    # initiate model
+    # initiate model, optimizer
     model = uNetPascalVOC(checkpoint["max_depth_level"], len(checkpoint["selected_classes"]))
+    optimizer = Adam(model.parameters(), lr=1e-5)
 
     # load parameters from checkpoint
     model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
     # print loaded parameters
     logging.info(f"Loaded model from checkpoint: {checkpoint_path}")

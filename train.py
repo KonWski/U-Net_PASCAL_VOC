@@ -60,16 +60,16 @@ def train_model(
 
     if load_model:
         model, optimizer, loaded_checkpoint = load_checkpoint(f"{checkpoints_dir}/uNetPascalVOC")
+        model = model.to(device)
         best_test_loss = min(float("inf"), loaded_checkpoint["test_loss"])
         start_epoch = loaded_checkpoint["epoch"] + 1
 
     else:
         model = uNetPascalVOC(4, n_classes, initialize_model_weights)
+        model = model.to(device)
         optimizer = Adam(model.parameters(), lr=1e-5)
         best_test_loss = float("inf")
         start_epoch = 0
-
-    model = model.to(device)
 
     for epoch in range(start_epoch, n_epochs):
         

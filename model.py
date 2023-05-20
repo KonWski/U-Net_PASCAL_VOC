@@ -162,12 +162,14 @@ def save_checkpoint(checkpoint: dict, checkpoint_path: str):
     logging.info(8*"-")
 
 
-def load_checkpoint(checkpoint_path: str):
+def load_checkpoint(model: uNetPascalVOC, optimizer: torch.optim, checkpoint_path: str):
     '''
     loads model checkpoint from given path
 
     Parameters
     ----------
+    model : uNetPascalVOC
+    optimizer : torch.optim
     checkpoint_path : str
         Path to checkpoint
 
@@ -179,6 +181,7 @@ def load_checkpoint(checkpoint_path: str):
                 - depth level of model
                 - selected classes
                 - model_state_dict
+                - optimizer_state_dict
                 - save time
     '''
     checkpoint = torch.load(checkpoint_path)

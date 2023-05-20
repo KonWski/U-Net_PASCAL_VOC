@@ -201,7 +201,7 @@ def load_checkpoint(checkpoint_path: str):
 
     logging.info(8*"-")
 
-    return model, checkpoint
+    return model, optimizer, checkpoint
 
 
 def test_model(height: int, width: int, n_channels: int, max_depth_level: int, n_classes: int):

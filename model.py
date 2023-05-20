@@ -186,10 +186,6 @@ def load_checkpoint(model: uNetPascalVOC, optimizer: torch.optim, checkpoint_pat
     '''
     checkpoint = torch.load(checkpoint_path)
 
-    # initiate model, optimizer
-    model = uNetPascalVOC(checkpoint["max_depth_level"], len(checkpoint["selected_classes"]))
-    optimizer = Adam(model.parameters(), lr=1e-5)
-
     # load parameters from checkpoint
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])

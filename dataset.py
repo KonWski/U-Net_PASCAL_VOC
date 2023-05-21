@@ -273,30 +273,11 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         image = transform_image(image_vis)
 
-        # image = to_tensor(cv2.imread(self.images[idx]))
         mask = cv2.imread(self.masks[idx])
-        # print(f"np.unique(mask before cvt): {np.unique(mask)}")
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
-        # print(f"np.unique(mask after cvt): {np.unique(mask)}")
-        # print(f"type(mask): {type(mask)}")
-        
-        # print(f"image.shape: {image.shape}")
-        # print(f"mask.shape: {mask.shape}")
-
-        # image = Image.open(self.images[idx])
-        # mask = Image.open(self.masks[idx])
-
-        # print(f"torch.max(image): {torch.max(image)}")
-        # print(f"torch.max(mask): {torch.max(mask)}")
 
         # additional channel for background
-        # [319, 500, 2]
         encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes)])
-        # encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
-        # encoded_mask = torch.zeros([mask.shape[1], mask.shape[2], len(self.selected_classes) + 1])
-
-        # TODO encoded_mask.shape: torch.Size([1, 500, 334, 2])
-        # print(f"encoded_mask.shape: {encoded_mask.shape}")
 
         # information if selected class was found in the picture
         no_selected_classes_found = True
@@ -305,30 +286,18 @@ class PascalVOCSegmentation(VOCSegmentation):
         # - each channel refers to specific class
         for selected_class in self.selected_classes:
             
-            # print(f"selected_class: {selected_class}")
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
-            # print(f"class_color_encoding: {class_color_encoding}")
 
             class_pixels_indices = np.all(mask == class_color_encoding, -1)
             found_class = np.any(class_pixels_indices)
             class_pixels_indices = torch.Tensor(np.where(class_pixels_indices, 1, 0))
 
-            # print(f"np.unique(mask): {np.unique(mask)}")
-            # print(f"type(class_pixels_indices): {type(class_pixels_indices)}")
-            # print(f"class_pixels_indices: {class_pixels_indices}")
-            # print(f"class_pixels_indices.shape: {class_pixels_indices}")
-            # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
-
             # array empty if no pixels belong to specified class
             if found_class:
-                # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], class_pixels_indices[2], channel_id] = 1
                 encoded_mask[:, :, channel_id] = class_pixels_indices
-                # encoded_mask[class_pixels_indices[0], class_pixels_indices[1], channel_id] = 1
-                no_selected_classes_found = False if selected_class != "background" else no_selected_classes_found
+                no_selected_classes_found = False if selected_class not in ("background", "border") else no_selected_classes_found
 
-        # print(f"Before _split_image_mask encoded_mask.shape: {encoded_mask.shape}")
-        # print(f"Before _split_image_mask image.shape: {image.shape}")
         if no_selected_classes_found:
             split_image, split_mask = torch.Tensor(), torch.Tensor()
 

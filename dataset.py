@@ -121,8 +121,9 @@ class PascalVOCSegmentation(VOCSegmentation):
         
         # random center crop
         if random.random() > 0.5:
-            image = center_crop(image)
-            mask = center_crop(mask)
+
+            image = center_crop(image, [285, 285])
+            mask = center_crop(mask, [285, 285])
 
         # return to original dimensions order
         mask = mask.permute(1, 2, 0)

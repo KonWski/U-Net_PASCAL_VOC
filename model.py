@@ -4,8 +4,7 @@ import math
 import torch
 import logging
 import argparse
-from torch.nn.init import normal_
-from torch.optim import Adam
+from torchvision.transforms.functional import resize
 
 class uNetContractingBlock(nn.Module):
 
@@ -98,8 +97,9 @@ class uNetExpandingBlock(nn.Module):
         x = self.activation_function(x)
 
         # concatenation
-        x_cropped = x_coppied[:, :, :x.shape[2], :x.shape[3]]
-        x = concat([x, x_cropped], 1)
+        # x_cropped = x_coppied[:, :, :x.shape[2], :x.shape[3]]
+        x_resized = resize(x_coppied, x.shape[2:])
+        x = concat([x, x_resized], 1)
 
         # convolution part
         x = self.conv2(x)

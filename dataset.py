@@ -1,5 +1,5 @@
 from torchvision.datasets import VOCSegmentation
-from torchvision.transforms.functional import hflip
+from torchvision.transforms.functional import hflip, center_crop
 import cv2
 import numpy as np
 import torch
@@ -7,7 +7,6 @@ from typing import List
 import math
 import torch.nn.functional as F
 import random
-from torchvision.transforms.functional import to_tensor
 from torchvision import transforms
 
 class PascalVOCSegmentation(VOCSegmentation):
@@ -120,6 +119,11 @@ class PascalVOCSegmentation(VOCSegmentation):
             image = hflip(image)
             mask = hflip(mask)
         
+        # random center crop
+        if random.random() > 0.5:
+            image = center_crop(image)
+            mask = center_crop(mask)
+
         # return to original dimensions order
         mask = mask.permute(1, 2, 0)
 

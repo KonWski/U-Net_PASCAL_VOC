@@ -103,7 +103,7 @@ class uNetExpandingBlock(nn.Module):
         left_width = x_coppied.shape[3] - x.shape[3]
         margin_width = int(left_width / 2)
 
-        x_cropped = x_coppied[:, :, left_height : (left_height + margin_height), left_width : (left_width + margin_width)]
+        x_cropped = x_coppied[:, :, margin_height : (margin_height + x.shape[2]), margin_width : (margin_width + x.shape[3])]
 
         # concatenation
         # x_cropped = x_coppied[:, :, :x.shape[2], :x.shape[3]]

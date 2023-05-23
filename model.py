@@ -96,10 +96,19 @@ class uNetExpandingBlock(nn.Module):
         x = self.batchnorm1(x)
         x = self.activation_function(x)
 
+        # crop middle (height, width) part of tensor
+        left_height = x_coppied.shape[2] - x.shape[2]
+        margin_height = int(left_height / 2)
+        
+        left_width = x_coppied.shape[3] - x.shape[3]
+        margin_width = int(left_width / 2)
+
+        x_cropped = x_coppied[:, :, left_height : (left_height + margin_height), left_width : (left_width + margin_width)]
+
         # concatenation
         # x_cropped = x_coppied[:, :, :x.shape[2], :x.shape[3]]
-        x_resized = resize(x_coppied, x.shape[2:])
-        x = concat([x, x_resized], 1)
+        # x_resized = resize(x_coppied, x.shape[2:])
+        x = concat([x, x_cropped], 1)
 
         # convolution part
         x = self.conv2(x)

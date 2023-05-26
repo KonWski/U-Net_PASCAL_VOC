@@ -61,5 +61,5 @@ if __name__ == "__main__":
 
     model = train_model(device, args["n_epochs"], args["checkpoints_dir"], args["download_datasets"], 
                         args["root_datasets_dir"], args["years_train"], args["years_test"], 
-                        args["year"], args["selected_classes"], args["splitted_mask_size"], 
-                        args["default_boundary_size"], args["initialize_model_weights"], args["load_model"])
+                        args["selected_classes"], args["splitted_mask_size"], args["default_boundary_size"], 
+                        args["initialize_model_weights"], args["load_model"])

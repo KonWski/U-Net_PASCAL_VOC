@@ -10,7 +10,8 @@ def get_args():
     parser.add_argument('--checkpoints_dir', type=str, help='Path to directory where checkpoint will be saved')
     parser.add_argument('--download_datasets', type=str, help='Download dataset from Torchvision repo or use already existing dataset')
     parser.add_argument('--root_datasets_dir', type=str, help='Path where dataset should be downloaded or where is it already stored')
-    parser.add_argument('--year', type=str, help='year of Pascal VOC competition "2007" to "2012"')
+    parser.add_argument('--years_train', type=str, help='years of Pascal VOC competition "2007" to "2012" separated by commas used for training')
+    parser.add_argument('--years_test', type=str, help='years of Pascal VOC competition "2007" to "2012" separated by commas used for testing')
     parser.add_argument('--selected_classes', type=str, help='classes seperated by commas')
     parser.add_argument('--splitted_mask_size', type=int, help='width and height of smaller piece of mask')
     parser.add_argument('--default_boundary_size', type=int, help='padding size around cut out image piece')
@@ -30,6 +31,8 @@ def get_args():
 
     # parse str to list (selected_classes)
     args["selected_classes"] = args["selected_classes"].split(",")
+    args["years_train"] = args["years_train"].split(",")
+    args["years_test"] = args["years_test"].split(",")
 
     # extend selected_classes with background
     if "background" not in args["selected_classes"] and args["selected_classes"][0] != "all":
@@ -57,6 +60,6 @@ if __name__ == "__main__":
     assert args["load_model"] != args["initialize_model_weights"], "Parameter load_model shouldn't be equal to initialize_model_weights"
 
     model = train_model(device, args["n_epochs"], args["checkpoints_dir"], args["download_datasets"], 
-                        args["root_datasets_dir"], args["year"], args["selected_classes"],
-                        args["splitted_mask_size"], args["default_boundary_size"],
-                        args["initialize_model_weights"], args["load_model"])
+                        args["root_datasets_dir"], args["years_train"], args["years_test"], 
+                        args["year"], args["selected_classes"], args["splitted_mask_size"], 
+                        args["default_boundary_size"], args["initialize_model_weights"], args["load_model"])

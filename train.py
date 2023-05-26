@@ -14,7 +14,8 @@ def train_model(
         checkpoints_dir: str,
         download_datasets: bool,
         root_datasets_dir: str,
-        year: str,
+        years_train: List[str],
+        years_test: List[str],
         selected_classes: List[str],
         splitted_mask_size: int,
         default_boundary: int,
@@ -30,8 +31,10 @@ def train_model(
         path to directory where checkpoints will be stored
     download_datasets: bool
         True -> download dataset from torchvision repo
-    year: str
-        year of Pascal VOC competition "2007" to "2012"
+    years_train: List[str]
+        years of Pascal VOC competition "2007" to "2012" separated by commas used for training
+    years_test: List[str]
+        years of Pascal VOC competition "2007" to "2012" separated by commas used for testing    
     root_datasets_dir: str
         path to directory where dataset should be downloaded (download_datasets = True)
         or where dataset is already stored
@@ -46,16 +49,16 @@ def train_model(
     BATCH_SIZE = 1
 
     # datasets and dataloaders
-    trainset = PascalVOCSegmentation(f'{root_datasets_dir}/train/', year, "train", selected_classes, splitted_mask_size, 
-                                     default_boundary, True, download_datasets)
-    train_loader = DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
+    trainsets = [PascalVOCSegmentation(f'{root_datasets_dir}/train/{year}/', year, "train", selected_classes, splitted_mask_size, 
+                                     default_boundary, True, download_datasets) for year in years_train]
+    train_loaders = [DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True) for trainset in trainsets]
 
-    testset = PascalVOCSegmentation(f'{root_datasets_dir}/test/', year, "test", selected_classes, splitted_mask_size,
-                                     default_boundary, False, download_datasets)
-    test_loader = DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False)
+    testsets = [PascalVOCSegmentation(f'{root_datasets_dir}/test/{year}/', year, "test", selected_classes, splitted_mask_size,
+                                     default_boundary, False, download_datasets) for year in years_test]
+    test_loaders = [DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False) for testset in testsets]
 
     # update selected classes in case of 'all'
-    selected_classes = trainset.selected_classes
+    selected_classes = trainsets[0].selected_classes
     n_classes = len(selected_classes)
 
     model = uNetPascalVOC(4, n_classes, initialize_model_weights)
@@ -75,7 +78,7 @@ def train_model(
         
         checkpoint = {}
 
-        for state, loader in zip(["train", "test"], [train_loader, test_loader]):
+        for state, loaders in zip(["train", "test"], [train_loaders, test_loaders]):
 
             # calculated parameters
             running_loss = 0.0
@@ -88,38 +91,40 @@ def train_model(
             else:
                 model.eval()
 
-            for id, batch in enumerate(loader, 0):
+            for loader in loaders:
 
-                with torch.set_grad_enabled(state == 'train'):
-                    
-                    image, split_image, split_mask, no_selected_classes_found = batch
+                for id, batch in enumerate(loader, 0):
 
-                    # run only on images where at least one selected class was found
-                    if no_selected_classes_found.item():
-                        continue                        
-                    
-                    n_imgs_loss += 1
+                    with torch.set_grad_enabled(state == 'train'):
+                        
+                        image, split_image, split_mask, no_selected_classes_found = batch
 
-                    # first element - loader creates one element batch
-                    split_image = [img_piece[0] for img_piece in split_image]
-                    split_mask = [mask_piece[0] for mask_piece in split_mask]
+                        # run only on images where at least one selected class was found
+                        if no_selected_classes_found.item():
+                            continue                        
+                        
+                        n_imgs_loss += 1
 
-                    split_image = torch.stack(split_image)
-                    split_mask = torch.stack(split_mask)
+                        # first element - loader creates one element batch
+                        split_image = [img_piece[0] for img_piece in split_image]
+                        split_mask = [mask_piece[0] for mask_piece in split_mask]
 
-                    optimizer.zero_grad()
-                    
-                    split_image = split_image.to(device)
-                    outputs = model(split_image).to(device)
-                    split_mask = split_mask.to(device)
-                    loss = criterion(outputs, split_mask)
+                        split_image = torch.stack(split_image)
+                        split_mask = torch.stack(split_mask)
 
-                    if state == "train":
-                        loss.backward()
-                        optimizer.step()
+                        optimizer.zero_grad()
+                        
+                        split_image = split_image.to(device)
+                        outputs = model(split_image).to(device)
+                        split_mask = split_mask.to(device)
+                        loss = criterion(outputs, split_mask)
 
-                # statistics
-                running_loss += loss.item()
+                        if state == "train":
+                            loss.backward()
+                            optimizer.step()
+
+                    # statistics
+                    running_loss += loss.item()
 
             # save and log epoch statistics
             epoch_loss = round(running_loss / n_imgs_loss, 5)

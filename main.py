@@ -36,7 +36,12 @@ def get_args():
 
     # extend selected_classes with background
     if "background" not in args["selected_classes"] and args["selected_classes"][0] != "all":
-        args["selected_classes"].append("background")
+        args["selected_classes"].insert(0, "background")
+    
+    # make sure background class is at the first place
+    else:
+        background_id = args["selected_classes"].index("background")
+        args["selected_classes"][0], args["selected_classes"][background_id] = "background", args["selected_classes"][0]
 
     # log input parameters
     logging.info(8*"-")

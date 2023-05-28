@@ -53,9 +53,16 @@ def train_model(
                                      default_boundary, True, download_datasets) for year in years_train]
     train_loaders = [DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True) for trainset in trainsets]
 
-    testsets = [PascalVOCSegmentation(f'{root_datasets_dir}/test/{year}/', year, "test", selected_classes, splitted_mask_size,
-                                     default_boundary, False, download_datasets) for year in years_test]
+    testsets = [PascalVOCSegmentation(f'{root_datasets_dir}/test/{year}/', year, "test" if year == "2007" else "val", 
+                                      selected_classes, splitted_mask_size, default_boundary, 
+                                      False, download_datasets) for year in years_test]
     test_loaders = [DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False) for testset in testsets]
+
+    n_train_observations = sum([len(dataset) for dataset in trainsets])
+    n_test_observations = sum([len(dataset) for dataset in testsets])
+
+    logging.info(f"Number of all training observations: {n_train_observations}")
+    logging.info(f"Number of all testing observations: {n_test_observations}")
 
     # update selected classes in case of 'all'
     selected_classes = trainsets[0].selected_classes

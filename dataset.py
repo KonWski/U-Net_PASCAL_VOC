@@ -160,10 +160,10 @@ class PascalVOCSegmentation(VOCSegmentation):
             mask = center_crop(mask, [285, 285])
 
         # rotation
-        if random.random() > 0.5:
-            angle = random.randint(1, 30)
-            image = rotate(image, angle)
-            mask = rotate(mask, angle, fill=0)
+        # if random.random() > 0.5:
+        #     angle = random.randint(1, 30)
+        #     image = rotate(image, angle)
+        #     mask = rotate(mask, angle, fill=0)
 
         # color jitter
         if random.random() > 0.5:
@@ -292,11 +292,6 @@ class PascalVOCSegmentation(VOCSegmentation):
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
 
-            print(f"class_color_encoding: {class_color_encoding}")
-            print(f"type(class_color_encoding): {type(class_color_encoding)}")
-
-            print(f"mask.shape: {mask.shape}")
-
             class_pixels_indices = np.all(mask == class_color_encoding, -1)
             found_class = np.any(class_pixels_indices)
             class_pixels_indices = torch.Tensor(np.where(class_pixels_indices, 1, 0))
@@ -304,6 +299,11 @@ class PascalVOCSegmentation(VOCSegmentation):
             # array empty if no pixels belong to specified class
             if found_class:
                 encoded_mask[:, :, channel_id] = class_pixels_indices
+
+        # fill uncovered mask parts (when only part of classes were used) with background
+        misssing_background_indices = np.all(mask == [0, 0, 0], -1)
+        misssing_background_indices = torch.Tensor(np.where(class_pixels_indices, 1, 0))
+        encoded_mask[:, :, 0] = misssing_background_indices
 
         if self.augmentation:
             image, encoded_mask = self._transform(image, encoded_mask)

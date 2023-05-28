@@ -292,6 +292,11 @@ class PascalVOCSegmentation(VOCSegmentation):
             channel_id = self.class_to_color[selected_class][0]
             class_color_encoding = self.class_to_color[selected_class][1]
 
+            print(f"class_color_encoding: {class_color_encoding}")
+            print(f"type(class_color_encoding): {type(class_color_encoding)}")
+
+            print(f"mask.shape: {mask.shape}")
+
             class_pixels_indices = np.all(mask == class_color_encoding, -1)
             found_class = np.any(class_pixels_indices)
             class_pixels_indices = torch.Tensor(np.where(class_pixels_indices, 1, 0))

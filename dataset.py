@@ -112,21 +112,14 @@ class PascalVOCSegmentation(VOCSegmentation):
         self.class_to_color = {selected_class: (id, self._color_map[self._classes_names.index(selected_class)]) 
                                for id, selected_class in enumerate(self.selected_classes)}
 
-        updated_images, updated_masks = self._get_images_and_masks()
-        self.images = updated_images
-        self.masks = updated_masks
+        self.limited_images, self.limited_masks = self._get_images_and_masks()
 
     def _get_images_and_masks(self):
 
         xml_dir_path = f"{self.root}/VOCdevkit/VOC{self.year}/Annotations"        
-        updated_images = []
-        updated_masks = []
+        limited_images = []
+        limited_masks = []
         
-        '''
-        /content/dataset/VOCdevkit/VOC2007/JPEGImages/000068.jpg
-        /content/dataset/VOCdevkit/VOC2007/SegmentationClass/000068.png
-        /content/dataset/VOCdevkit/VOC2007/Annotations/000068.xml
-        '''
         for image_path, mask_path in zip(self.images, self.masks):
 
             image_id = image_path.split("/")[-1].split(".")[0]
@@ -145,10 +138,10 @@ class PascalVOCSegmentation(VOCSegmentation):
                 for selected_class in self.selected_classes:
                     if selected_class in obj.get_text():
 
-                        updated_images.append(image_path)
-                        updated_masks.append(mask_path)
+                        limited_images.append(image_path)
+                        limited_masks.append(mask_path)
         
-        return updated_images, updated_masks
+        return limited_images, limited_masks
 
 
     def _transform(self, image, mask):
@@ -276,7 +269,7 @@ class PascalVOCSegmentation(VOCSegmentation):
 
     def __getitem__(self, idx):
         
-        image_vis = cv2.imread(self.images[idx])
+        image_vis = cv2.imread(self.limited_images[idx])
         image_vis = cv2.cvtColor(image_vis, cv2.COLOR_BGR2RGB)
         
         transform_image = transforms.Compose([
@@ -286,7 +279,7 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         image = transform_image(image_vis)
 
-        mask = cv2.imread(self.masks[idx])
+        mask = cv2.imread(self.limited_masks[idx])
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
 
         # additional channel for background

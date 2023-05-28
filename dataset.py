@@ -288,9 +288,6 @@ class PascalVOCSegmentation(VOCSegmentation):
         # additional channel for background
         encoded_mask = torch.zeros([mask.shape[0], mask.shape[1], len(self.selected_classes)])
 
-        # information if selected class was found in the picture
-        no_selected_classes_found = True
-
         # convert color encoding into channel encoding -
         # - each channel refers to specific class
         for selected_class in self.selected_classes:
@@ -305,17 +302,11 @@ class PascalVOCSegmentation(VOCSegmentation):
             # array empty if no pixels belong to specified class
             if found_class:
                 encoded_mask[:, :, channel_id] = class_pixels_indices
-                no_selected_classes_found = False if selected_class not in ("background", "border") else no_selected_classes_found
 
-        if no_selected_classes_found:
-            split_image, split_mask = torch.Tensor(), torch.Tensor()
+        if self.augmentation:
+            image, encoded_mask = self._transform(image, encoded_mask)
+        
+        # split images and masks to smaller parts
+        split_image, split_mask = self._split_image_mask(image, encoded_mask)
 
-        else:
-
-            if self.augmentation:
-                image, encoded_mask = self._transform(image, encoded_mask)
-            
-            # split images and masks to smaller parts
-            split_image, split_mask = self._split_image_mask(image, encoded_mask)
-
-        return image_vis, split_image, split_mask, no_selected_classes_found
+        return image_vis, split_image, split_mask

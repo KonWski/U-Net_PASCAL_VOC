@@ -301,7 +301,7 @@ class PascalVOCSegmentation(VOCSegmentation):
                 encoded_mask[:, :, channel_id] = class_pixels_indices
 
         # fill uncovered mask parts (when only part of classes were used) with background
-        misssing_background_indices = np.all(mask == [0, 0, 0], -1)
+        misssing_background_indices = np.all(encoded_mask == [0, 0, 0], -1)
         misssing_background_indices = torch.Tensor(np.where(class_pixels_indices, 1, 0))
         encoded_mask[:, :, 0] = misssing_background_indices
 

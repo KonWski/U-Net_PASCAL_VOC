@@ -307,3 +307,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         split_image, split_mask = self._split_image_mask(image, encoded_mask)
 
         return image_vis, split_image, split_mask
+    
+    
+    def __len__(self) -> int:
+        return len(self.limited_images)

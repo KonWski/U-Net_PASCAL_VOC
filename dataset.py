@@ -1,5 +1,5 @@
 from torchvision.datasets import VOCSegmentation
-from torchvision.transforms.functional import hflip, center_crop
+from torchvision.transforms.functional import hflip, center_crop, rotate
 import cv2
 import numpy as np
 import torch
@@ -8,6 +8,10 @@ import math
 import torch.nn.functional as F
 import random
 from torchvision import transforms
+import random
+import os
+from bs4 import BeautifulSoup
+import pandas as pd
 
 class PascalVOCSegmentation(VOCSegmentation):
 
@@ -107,23 +111,68 @@ class PascalVOCSegmentation(VOCSegmentation):
         # class_name -> (id, color in mask)
         self.class_to_color = {selected_class: (id, self._color_map[self._classes_names.index(selected_class)]) 
                                for id, selected_class in enumerate(self.selected_classes)}
-        # print(self.class_to_color)
+
+        self.images, self.masks = self._get_images_and_masks()
+
+
+    def _get_images_and_masks(self):
+
+        xml_dir_path = f"{self.root}/VOCdevkit/VOC{self.year}/Annotations"        
+        updated_images = []
+        updated_masks = []
+        
+        '''
+        /content/dataset/VOCdevkit/VOC2007/JPEGImages/000068.jpg
+        /content/dataset/VOCdevkit/VOC2007/SegmentationClass/000068.png
+        /content/dataset/VOCdevkit/VOC2007/Annotations/000068.xml
+        '''
+        for image_path, mask_path in zip(self.images, self.masks):
+
+            image_id = image_path.split("/")[-1].split(".")[0]
+            xml_annotation_path = f"{xml_dir_path}/{image_id}.xml"
+
+            with open(xml_annotation_path, "r") as xml_file:
+                xml_data = xml_file.read()
+
+            # convert xml data to BeautifulSoup
+            xml_data = BeautifulSoup(xml_data, "xml")
+
+            # check if any selected classes occure in listed objects inside of xml file
+            objects = xml_data.find_all("object")
+
+            for obj in objects:
+                for selected_class in self.selected_classes:
+                    if selected_class in obj.get_text():
+
+                        updated_images.append(image_path)
+                        updated_masks.append(mask_path)
+        
+        return updated_images, updated_masks
+
 
     def _transform(self, image, mask):
         
         # shape of mask before flip should look like this: (class_dim, height, width)
         mask = mask.permute(2, 0, 1)
 
-        # random horizontal flip
+        # horizontal flip
         if random.random() > 0.5:
             image = hflip(image)
             mask = hflip(mask)
         
-        # random center crop
+        # center crop
         if random.random() > 0.5:
-
             image = center_crop(image, [285, 285])
             mask = center_crop(mask, [285, 285])
+
+        # rotation
+        # if random.random() > 0.5:
+        #     angle = random.randint(1, 30)
+        #     image = rotate(image, angle)
+        #     mask = rotate(mask, angle, fill=0)
+
+        # color jitter
+        
 
         # return to original dimensions order
         mask = mask.permute(1, 2, 0)
@@ -145,52 +194,33 @@ class PascalVOCSegmentation(VOCSegmentation):
         # temporarily change order of dimensions in mask
         mask = mask.permute(2, 0, 1)
 
-        # print(f"split_image_mask method mask.shape: {mask.shape}")
-        # print(f"split_image_mask method image.shape: {image.shape}")
-
         # cut out parts of original image and mask
         output_subimages = []
         output_submasks = []
         
         image_height = image.shape[1]
-        # print(f"image_height: {image_height}")
         image_width = image.shape[2]
-        # print(f"image_width: {image_width}")
 
         # n_rows x n_cols is the number of output smaller parts
         n_rows = math.ceil(image_height / self.splitted_mask_size)
-        # print(f"n_rows: {n_rows}")
         n_cols = math.ceil(image_width / self.splitted_mask_size)
-        # print(f"n_cols: {n_cols}")
 
         for n_row in range(n_rows):
             
-            # upper and lower border of mask/image piece
-            # print(f"n_row: {n_row}")
-            
+            # upper and lower border of mask/image piece            
             row_split_mask_0 = n_row * self.splitted_mask_size
             row_split_img_0 = max(0, row_split_mask_0 - self.default_boundary)
-            # row_split_img_0 = row_split_mask_0
 
             row_split_mask_1 = (n_row + 1) * self.splitted_mask_size
-            # print(f"row_split_1: {row_split_1}")
-
             row_split_img_1 = min(image_height, row_split_mask_1 + self.default_boundary)
-            # print(f"row_split_image_1: {row_split_img_1}")
 
-            # TODO fix - gives negative values
             padding_img_top = abs(row_split_mask_0 - self.default_boundary) - row_split_img_0
-
             padding_img_bottom = (row_split_mask_1 + self.default_boundary) - row_split_img_1
-            # print(f"padding_img_top: {padding_img_top}")
-            # print(f"padding_img_bottom: {padding_img_bottom}")
 
             # corner case - lower border exceeds original image
             if row_split_mask_1 > image_height:
-                # padding_img_bottom = self.default_boundary + (row_split_mask_1 - image_height)
                 padding_mask_bottom = row_split_mask_1 - image_height
             else:
-                # padding_img_bottom = self.default_boundary
                 padding_mask_bottom = 0
             
             for n_column in range(n_cols):
@@ -198,66 +228,40 @@ class PascalVOCSegmentation(VOCSegmentation):
                 # left and right border of mask/image piece
                 column_split_mask_0 = n_column * self.splitted_mask_size
                 column_split_img_0 = max(0, column_split_mask_0 - self.default_boundary)
-                # column_split_img_0 = column_split_mask_0
 
                 column_split_mask_1 = (n_column + 1) * self.splitted_mask_size
                 column_split_img_1 = min(image_width, column_split_mask_1 + self.default_boundary)
                 
-                # TODO fix - gives negative values
                 padding_img_left = abs(column_split_mask_0 - self.default_boundary) - column_split_img_0
-
                 padding_img_right = (column_split_mask_1 + self.default_boundary) - column_split_img_1
 
                 # corner case - right border exceeds original image
                 if column_split_mask_1 > image_width:
-                    # padding_img_right = self.default_boundary + (column_split_mask_1 - image_width)
                     padding_mask_right = column_split_mask_1 - image_width
                 else:
-                    # padding_img_right = self.default_boundary
                     padding_mask_right = 0
                 
                 '''
                 padding size for image and mask pieces
                 padding size (left, right, top, bottom)
                 '''
-                # padding_img = (self.default_boundary, padding_img_right, self.default_boundary, padding_img_bottom)
                 padding_img = (padding_img_left, padding_img_right, padding_img_top, padding_img_bottom)
-                # print(f"padding_img: {padding_img}")
                 padding_mask = (0, padding_mask_right, 0, padding_mask_bottom)
-                # print(f"padding_mask: {padding_mask}")
 
                 # extract subimage and submask from input image and mask
-                # sub_image = image[:, row_split_mask_0:row_split_mask_1, column_split_0:column_split_1]
                 sub_image = image[:, row_split_img_0:row_split_img_1, column_split_img_0:column_split_img_1]
                 sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
-
-                # print(f"Image, height: {row_split_img_0}:{row_split_img_1}, width: {column_split_img_0}:{column_split_img_1}")
-                # print(f"Mask, height: {row_split_mask_0}:{row_split_mask_1}, width: {column_split_mask_0}:{column_split_mask_1}")
-
-                # return to original dimensions order in piece of mask
-                # sub_mask = sub_mask.permute(1, 2, 0)
-
-                # print(f"sub_image before padding shape: {sub_image.shape}")
-                # print(f"sub_mask before padding shape: {sub_mask.shape}")
                 
                 # add padding for image and mask piece
                 sub_image = F.pad(sub_image, padding_img)
                 sub_mask = F.pad(sub_mask, padding_mask)
 
                 # set part of mask that was extended by padding as background
-                # print(f"sub_mask.shape: {sub_mask.shape}")
-                # print(f"padding_mask_right: {padding_mask_right}")
-                # print(f"padding_mask_bottom: {padding_mask_bottom}")
-
                 if padding_mask_right > 0:
                     sub_mask[0, :, -padding_mask_right:] = torch.ones([sub_mask.shape[1], padding_mask_right])
                 
                 if padding_mask_bottom > 0:
                     sub_mask[0, -padding_mask_bottom:, :] = torch.ones([padding_mask_bottom, sub_mask.shape[2]])
-
-
-                # print(f"sub_image after padding shape: {sub_image.shape}")
-                # print(f"sub_mask after padding shape: {sub_mask.shape}")            
                 
                 # collect next pieces of image and mask part
                 output_subimages.append(sub_image)

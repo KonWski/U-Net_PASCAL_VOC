@@ -115,8 +115,14 @@ class PascalVOCSegmentation(VOCSegmentation):
         self.limited_images, self.limited_masks = self._get_images_and_masks()
 
     def _get_images_and_masks(self):
+        
+        # 2011 and 2012 dataset have different paths
+        if int(self.year) > 2010:
+            dir_name = "TrainVal" if self.image_set == "train" else "Test"
+            xml_dir_path = f"{self.root}{dir_name}/VOCdevkit/VOC{self.year}/Annotations"
+        else:
+            xml_dir_path = f"{self.root}/VOCdevkit/VOC{self.year}/Annotations"
 
-        xml_dir_path = f"{self.root}/VOCdevkit/VOC{self.year}/Annotations"        
         limited_images = []
         limited_masks = []
         

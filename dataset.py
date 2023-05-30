@@ -172,6 +172,7 @@ class PascalVOCSegmentation(VOCSegmentation):
             mask = rotate(mask, angle, fill=0)
 
             # fill new mask values with background class
+            print(f"mask.shape: {mask.shape}")
             misssing_background_indices = np.all(mask.numpy() == [0, 0, 0], -1)
             misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
             mask[:, :, 0] = misssing_background_indices

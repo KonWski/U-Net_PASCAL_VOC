@@ -162,12 +162,17 @@ class PascalVOCSegmentation(VOCSegmentation):
         # random crop
         if random.random() > 0.5:
             
-            channels, height, width = image.shape
+            channels, image_height, image_width = image.shape
 
-            top = random.randint(0, height - 1)
-            left = random.randint(0, width - 1)
-            crop_height = random.randint(1, height - top + 1)
-            crop_width = random.randint(1, width - left + 1)
+            min_height = 285
+            min_width = 284
+
+            top = random.randint(0, image_height - min_height - 1)
+            left = random.randint(0, image_width - min_width - 1)
+            
+            crop_height = random.randint(min_height, image_height - top + 1)
+            crop_width = random.randint(min_width, image_width - left + 1)
+
             image = crop(image, top, left, crop_height, crop_width)
             mask = crop(mask, top, left, crop_height, crop_width)
 

@@ -1,5 +1,5 @@
 from torchvision.datasets import VOCSegmentation
-from torchvision.transforms.functional import hflip, center_crop, rotate, crop
+from torchvision.transforms.functional import hflip, rotate, crop
 from torchvision.transforms import ColorJitter
 import cv2
 import numpy as np
@@ -158,11 +158,18 @@ class PascalVOCSegmentation(VOCSegmentation):
         if random.random() > 0.5:
             image = hflip(image)
             mask = hflip(mask)
-        
-        # center crop
+
+        # random crop
         if random.random() > 0.5:
-            image = center_crop(image, [285, 285])
-            mask = center_crop(mask, [285, 285])
+            
+            channels, height, width = image.shape
+
+            top = random.randint(height - 1)
+            left = random.randint(width - 1)
+            crop_height = random.randint(height - top + 1)
+            crop_width = random.randint(width - left + 1)
+            image = crop(image, top, left, crop_height, crop_width)
+
 
         # rotation
         # if random.random() > 0.5:
@@ -180,9 +187,8 @@ class PascalVOCSegmentation(VOCSegmentation):
 
         # color jitter
         if random.random() > 0.5:
-            color_jitter = ColorJitter(brightness=.5, hue=.3)
+            color_jitter = ColorJitter(brightness=0.15, contrast=0.15)
             image = color_jitter(image)
-        
 
         # return to original dimensions order
         mask = mask.permute(1, 2, 0)

@@ -167,14 +167,16 @@ class PascalVOCSegmentation(VOCSegmentation):
             min_height = 285
             min_width = 284
 
-            top = random.randint(0, image_height - min_height - 1)
-            left = random.randint(0, image_width - min_width - 1)
-            
-            crop_height = random.randint(min_height, image_height - top + 1)
-            crop_width = random.randint(min_width, image_width - left + 1)
+            if image_height > min_height and image_width > min_width:
 
-            image = crop(image, top, left, crop_height, crop_width)
-            mask = crop(mask, top, left, crop_height, crop_width)
+                top = random.randint(0, image_height - min_height - 1)
+                left = random.randint(0, image_width - min_width - 1)
+                
+                crop_height = random.randint(min_height, image_height - top + 1)
+                crop_width = random.randint(min_width, image_width - left + 1)
+
+                image = crop(image, top, left, crop_height, crop_width)
+                mask = crop(mask, top, left, crop_height, crop_width)
 
 
         # rotation

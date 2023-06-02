@@ -296,13 +296,8 @@ class PascalVOCSegmentation(VOCSegmentation):
         
         image_vis = cv2.imread(self.limited_images[idx])
         image_vis = cv2.cvtColor(image_vis, cv2.COLOR_BGR2RGB)
-        
-        transform_image = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
 
-        image = transform_image(image_vis)
+        image = transforms.ToTensor()(image)
 
         mask = cv2.imread(self.limited_masks[idx])
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
@@ -328,12 +323,16 @@ class PascalVOCSegmentation(VOCSegmentation):
         # fill uncovered mask parts (when only part of classes were used) with background
         misssing_background_indices = np.all(encoded_mask.numpy() == [0, 0, 0], -1)
         misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
+
         if torch.numel(misssing_background_indices) > 0:
             encoded_mask[:, :, 0] = misssing_background_indices
 
         if self.augmentation:
             image, encoded_mask = self._transform(image, encoded_mask)
         
+        # image normalization
+        image = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(image)
+
         # split images and masks to smaller parts
         split_image, split_mask = self._split_image_mask(image, encoded_mask)
 

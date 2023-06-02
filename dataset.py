@@ -297,7 +297,7 @@ class PascalVOCSegmentation(VOCSegmentation):
         image_vis = cv2.imread(self.limited_images[idx])
         image_vis = cv2.cvtColor(image_vis, cv2.COLOR_BGR2RGB)
 
-        image = transforms.ToTensor()(image)
+        image = transforms.ToTensor()(image_vis)
 
         mask = cv2.imread(self.limited_masks[idx])
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)

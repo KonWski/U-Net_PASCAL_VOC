@@ -179,19 +179,19 @@ class PascalVOCSegmentation(VOCSegmentation):
                 mask = crop(mask, top, left, crop_height, crop_width)
 
 
-        # rotation
-        # if random.random() > 0.5:
+        # random rotation
+        if random.random() > 0.5:
 
-        #     angle = random.randint(1, 30)
-        #     image = rotate(image, angle, fill=0)
-        #     mask = rotate(mask, angle, fill=0)
+            angle = random.randint(-15, 15)
+            image = rotate(image, angle, fill=0)
+            mask = rotate(mask, angle, fill=0)
 
-        #     # fill new mask values with background class
-        #     mask = mask.permute(1,2,0)
-        #     misssing_background_indices = np.all(mask.numpy() == [0, 0, 0], -1)
-        #     misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
-        #     mask[:, :, 0] = misssing_background_indices
-        #     mask = mask.permute(2, 0, 1)
+            # fill new mask values with background class
+            mask = mask.permute(1, 2, 0)
+            misssing_background_indices = np.all(mask.numpy() == [0 for selected_class in self.selected_classes], -1)
+            misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
+            mask[:, :, 0] = mask[:, :, 0] + misssing_background_indices
+            mask = mask.permute(2, 0, 1)
 
         # color jitter
         if random.random() > 0.5:

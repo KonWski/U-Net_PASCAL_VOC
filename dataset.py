@@ -271,11 +271,15 @@ class PascalVOCSegmentation(VOCSegmentation):
                 '''
                 padding_img = (padding_img_left, padding_img_right, padding_img_top, padding_img_bottom)
                 padding_mask = (0, padding_mask_right, 0, padding_mask_bottom)
+                print(f"padding_img: {padding_img}")
+                print(f"padding_mask: {padding_mask}")
 
                 # extract subimage and submask from input image and mask
                 sub_image = image[:, row_split_img_0:row_split_img_1, column_split_img_0:column_split_img_1]
                 sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
-                
+                print(f"sub_image.shape: {sub_image.shape}")
+                print(f"sub_mask.shape: {sub_mask.shape}")
+
                 # add padding for image and mask piece
                 # sub_image = F.pad(sub_image, padding_img)
                 # sub_mask = F.pad(sub_mask, padding_mask)

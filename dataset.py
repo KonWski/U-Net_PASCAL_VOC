@@ -180,18 +180,18 @@ class PascalVOCSegmentation(VOCSegmentation):
 
 
         # random rotation
-        if random.random() > 0.5:
+        # if random.random() > 0.5:
 
-            angle = random.randint(-15, 15)
-            image = rotate(image, angle, fill=0)
-            mask = rotate(mask, angle, fill=0)
+        #     angle = random.randint(-15, 15)
+        #     image = rotate(image, angle, fill=0)
+        #     mask = rotate(mask, angle, fill=0)
 
-            # fill new mask values with background class
-            mask = mask.permute(1, 2, 0)
-            misssing_background_indices = np.all(mask.numpy() == [0 for selected_class in self.selected_classes], -1)
-            misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
-            mask[:, :, 0] = mask[:, :, 0] + misssing_background_indices
-            mask = mask.permute(2, 0, 1)
+        #     # fill new mask values with background class
+        #     mask = mask.permute(1, 2, 0)
+        #     misssing_background_indices = np.all(mask.numpy() == [0 for selected_class in self.selected_classes], -1)
+        #     misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
+        #     mask[:, :, 0] = mask[:, :, 0] + misssing_background_indices
+        #     mask = mask.permute(2, 0, 1)
 
         # color jitter
         if random.random() > 0.5:
@@ -277,15 +277,19 @@ class PascalVOCSegmentation(VOCSegmentation):
                 sub_mask = mask[:, row_split_mask_0:row_split_mask_1, column_split_mask_0:column_split_mask_1]            
                 
                 # add padding for image and mask piece
-                sub_image = F.pad(sub_image, padding_img)
-                sub_mask = F.pad(sub_mask, padding_mask)
+                # sub_image = F.pad(sub_image, padding_img)
+                # sub_mask = F.pad(sub_mask, padding_mask)
+                pad_image = torch.nn.ReflectionPad2d(padding_img)
+                pad_mask = torch.nn.ReflectionPad2d(padding_mask)
+                sub_image = pad_image(sub_image)
+                sub_mask = pad_mask(sub_mask)
 
                 # set part of mask that was extended by padding as background
-                if padding_mask_right > 0:
-                    sub_mask[0, :, -padding_mask_right:] = torch.ones([sub_mask.shape[1], padding_mask_right])
+                # if padding_mask_right > 0:
+                #     sub_mask[0, :, -padding_mask_right:] = torch.ones([sub_mask.shape[1], padding_mask_right])
                 
-                if padding_mask_bottom > 0:
-                    sub_mask[0, -padding_mask_bottom:, :] = torch.ones([padding_mask_bottom, sub_mask.shape[2]])
+                # if padding_mask_bottom > 0:
+                #     sub_mask[0, -padding_mask_bottom:, :] = torch.ones([padding_mask_bottom, sub_mask.shape[2]])
                 
                 # collect next pieces of image and mask part
                 output_subimages.append(sub_image)
@@ -323,11 +327,11 @@ class PascalVOCSegmentation(VOCSegmentation):
                 encoded_mask[:, :, channel_id] = class_pixels_indices
 
         # fill uncovered mask parts (when only part of classes were used) with background
-        misssing_background_indices = np.all(encoded_mask.numpy() == [0 for selected_class in self.selected_classes], -1)
-        misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
+        # misssing_background_indices = np.all(encoded_mask.numpy() == [0 for selected_class in self.selected_classes], -1)
+        # misssing_background_indices = torch.Tensor(np.where(misssing_background_indices, 1, 0))
 
-        if torch.numel(misssing_background_indices) > 0:
-            encoded_mask[:, :, 0] = encoded_mask[:, :, 0] + misssing_background_indices
+        # if torch.numel(misssing_background_indices) > 0:
+        #     encoded_mask[:, :, 0] = encoded_mask[:, :, 0] + misssing_background_indices
 
         if self.augmentation:
             image, encoded_mask = self._transform(image, encoded_mask)

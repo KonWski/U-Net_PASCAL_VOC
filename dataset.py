@@ -281,12 +281,12 @@ class PascalVOCSegmentation(VOCSegmentation):
                 print(f"sub_mask.shape: {sub_mask.shape}")
 
                 # add padding for image and mask piece
-                # sub_image = F.pad(sub_image, padding_img)
-                # sub_mask = F.pad(sub_mask, padding_mask)
-                pad_image = torch.nn.ReflectionPad2d(padding_img)
-                pad_mask = torch.nn.ReflectionPad2d(padding_mask)
-                sub_image = pad_image(sub_image)
-                sub_mask = pad_mask(sub_mask)
+                sub_image = F.pad(sub_image, padding_img)
+                sub_mask = F.pad(sub_mask, padding_mask)
+                # pad_image = torch.nn.ReflectionPad2d(padding_img)
+                # pad_mask = torch.nn.ReflectionPad2d(padding_mask)
+                # sub_image = pad_image(sub_image)
+                # sub_mask = pad_mask(sub_mask)
 
                 # set part of mask that was extended by padding as background
                 # if padding_mask_right > 0:

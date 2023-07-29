@@ -94,7 +94,7 @@ def train_model(
 
             # predictions holder for statistics
             # {n_plane: [class_name, proper predictions, all observations to be guessed]}
-            stats = {trainsets.class_to_color[0] : [key, 0, 0] for key in trainsets[0].class_to_color.keys()}
+            stats = {trainsets[0].class_to_color[0] : [key, 0, 0] for key in trainsets[0].class_to_color.keys()}
 
             criterion = CrossEntropyLoss()
 

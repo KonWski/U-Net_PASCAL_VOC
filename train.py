@@ -3,6 +3,7 @@ from dataset import PascalVOCSegmentation
 import torch
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
+from torch.nn.functional import softmax
 from torch.optim import Adam
 from model import uNetPascalVOC, save_checkpoint, load_checkpoint
 import logging
@@ -91,6 +92,10 @@ def train_model(
             running_loss = 0.0
             n_imgs_loss = 0
 
+            # predictions holder for statistics
+            # {n_plane: [class_name, proper predictions, all observations to be guessed]}
+            stats = {trainsets.class_to_color[0] : [key, 0, 0] for key in trainsets.class_to_color.keys()}
+
             criterion = CrossEntropyLoss()
 
             if state == "train":
@@ -122,6 +127,16 @@ def train_model(
                         split_mask = split_mask.to(device)
                         loss = criterion(outputs, split_mask)
 
+                        proba = softmax(outputs)
+                        proba = torch.argmax(proba, 0)
+
+                        for n_class in outputs.shape[0]:
+
+                            proba_n_class = torch.where(proba == n_class, proba, -1)
+                            correct_predictions = (proba_n_class == split_mask).sum().item()
+                            all_to_be_guessed = torch.where(split_mask == n_class, 1, 0).sum().item()
+                            stats[proba_n_class] = [stats[proba_n_class][0], stats[proba_n_class][1] + correct_predictions, stats[proba_n_class][2] + all_to_be_guessed]
+
                         if state == "train":
                             loss.backward()
                             optimizer.step()
@@ -136,6 +151,7 @@ def train_model(
             checkpoint[f"{state}_loss"] = epoch_loss
 
             logging.info(f"Epoch: {epoch}, state: {state}, loss: {epoch_loss}")
+            print(stats)
 
         if checkpoint["test_loss"] < best_test_loss:
             

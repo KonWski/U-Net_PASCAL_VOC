@@ -135,7 +135,7 @@ def train_model(
                             proba_n_class = torch.where(proba == n_class, proba, -1)
                             correct_predictions = (proba_n_class == split_mask).sum().item()
                             all_to_be_guessed = torch.where(split_mask == n_class, 1, 0).sum().item()
-                            stats[proba_n_class] = [stats[proba_n_class][0], stats[proba_n_class][1] + correct_predictions, stats[proba_n_class][2] + all_to_be_guessed]
+                            stats[n_class] = [stats[n_class][0], stats[n_class][1] + correct_predictions, stats[n_class][2] + all_to_be_guessed]
 
                         if state == "train":
                             loss.backward()

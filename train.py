@@ -130,7 +130,8 @@ def train_model(
                         proba = softmax(outputs)
                         proba = torch.argmax(proba, 0)
 
-                        for n_class in range(outputs.shape[0]):
+                        print(f"outputs.shape: {outputs.shape}")
+                        for n_class in range(outputs.shape[1]):
 
                             proba_n_class = torch.where(proba == n_class, proba, -1)
                             correct_predictions = (proba_n_class == split_mask).sum().item()

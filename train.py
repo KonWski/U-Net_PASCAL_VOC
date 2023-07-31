@@ -131,6 +131,8 @@ def train_model(
                         proba = torch.argmax(proba, 0)
 
                         print(f"outputs.shape: {outputs.shape}")
+                        print(f"proba.shape: {proba.shape}")
+
                         for n_class in range(outputs.shape[1]):
 
                             proba_n_class = torch.where(proba == n_class, proba, -1)

@@ -127,11 +127,12 @@ def train_model(
                         split_mask = split_mask.to(device)
                         loss = criterion(outputs, split_mask)
 
-                        proba = softmax(outputs)
-                        proba = torch.argmax(proba, 0)
+                        proba = softmax(outputs, 1)
+                        proba = torch.argmax(proba, 1)
 
                         print(f"outputs.shape: {outputs.shape}")
                         print(f"proba.shape: {proba.shape}")
+                        print(f"split_mask.shape: {split_mask.shape}")
 
                         for n_class in range(outputs.shape[1]):
 

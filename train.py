@@ -131,9 +131,9 @@ def train_model(
                         argmaxed_proba = torch.argmax(proba, 1)
                         argmaxed_split_mask = torch.argmax(split_mask, 1)
 
-                        print(f"outputs.shape: {outputs.shape}")
-                        print(f"proba.shape: {proba.shape}")
-                        print(f"split_mask.shape: {split_mask.shape}")
+                        # print(f"outputs.shape: {outputs.shape}")
+                        # print(f"proba.shape: {proba.shape}")
+                        # print(f"split_mask.shape: {split_mask.shape}")
 
                         for n_class in range(outputs.shape[1]):
 

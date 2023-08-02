@@ -128,7 +128,8 @@ def train_model(
                         loss = criterion(outputs, split_mask)
 
                         proba = softmax(outputs, 1)
-                        proba = torch.argmax(proba, 1)
+                        argmaxed_proba = torch.argmax(proba, 1)
+                        argmaxed_split_mask = torch.argmax(split_mask, 1)
 
                         print(f"outputs.shape: {outputs.shape}")
                         print(f"proba.shape: {proba.shape}")
@@ -136,9 +137,9 @@ def train_model(
 
                         for n_class in range(outputs.shape[1]):
 
-                            proba_n_class = torch.where(proba == n_class, proba, -1)
-                            correct_predictions = (proba_n_class == split_mask).sum().item()
-                            all_to_be_guessed = torch.where(split_mask == n_class, 1, 0).sum().item()
+                            proba_n_class = torch.where(argmaxed_proba == n_class, argmaxed_proba, -1)
+                            correct_predictions = (proba_n_class == argmaxed_split_mask).sum().item()
+                            all_to_be_guessed = torch.where(argmaxed_split_mask == n_class, 1, 0).sum().item()
                             stats[n_class] = [stats[n_class][0], stats[n_class][1] + correct_predictions, stats[n_class][2] + all_to_be_guessed]
 
                         if state == "train":

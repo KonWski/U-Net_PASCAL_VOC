@@ -156,7 +156,14 @@ def train_model(
             checkpoint[f"{state}_loss"] = epoch_loss
 
             logging.info(f"Epoch: {epoch}, state: {state}, loss: {epoch_loss}")
-            print(stats)
+
+            # stats logs
+            for key, value in stats.items():
+                class_name = value[0]
+                class_observations = value[2]
+                class_recall = round(value[1] / class_observations, 2)
+                logging.info(f"Class name: {class_name}, recall: {class_recall}, All observations: {class_observations}")
+                
 
         if checkpoint["test_loss"] < best_test_loss:
             

@@ -20,8 +20,8 @@ def concat_split_mask(split_mask: List[torch.Tensor], original_image: torch.Tens
     height_mask_split = split_mask[0].shape[1]
     width_mask_split = split_mask[0].shape[2]
 
-    original_image_height = original_image.shape[1]
-    original_image_width = original_image.shape[2]
+    original_image_height = original_image.shape[2]
+    original_image_width = original_image.shape[3]
     print(f"original_image_height: {original_image_height}")
     print(f"original_image_width: {original_image_width}")
 

@@ -20,7 +20,7 @@ def get_class_weights(dataset: PascalVOCSegmentation):
 
         # perform calculations for each of mask piece
         for mask_piece in split_mask:
-            
+            print(f"mask_piece.shape: {mask_piece.shape}")
             # calculate number of pixels with given class
             for n_class in range(n_selected_classes):
                 class_occurences[n_class] = class_occurences[n_class] + mask_piece[n_class, :, :].sum().item()

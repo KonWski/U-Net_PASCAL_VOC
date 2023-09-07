@@ -8,6 +8,7 @@ from torch.optim import Adam
 from model import uNetPascalVOC, save_checkpoint, load_checkpoint
 import logging
 from datetime import datetime
+from auxiliary import get_class_weights
 
 def train_model(
         device, 
@@ -58,6 +59,8 @@ def train_model(
                                       selected_classes, splitted_mask_size, default_boundary, 
                                       False, download_datasets) for year in years_test]
     test_loaders = [DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False) for testset in testsets]
+
+    classes_weights = get_class_weights(trainsets[0])
 
     n_train_observations = sum([len(dataset) for dataset in trainsets])
     n_test_observations = sum([len(dataset) for dataset in testsets])
@@ -125,7 +128,11 @@ def train_model(
                         split_image = split_image.to(device)
                         outputs = model(split_image).to(device)
                         split_mask = split_mask.to(device)
-                        loss = criterion(outputs, split_mask)
+
+                        losses = []
+                        for n_class in range(n_classes):
+                            loss = classes_weights[n_class] * criterion(outputs[n_class, :, :], split_mask[n_class, :, :])
+                            losses.append(loss)
 
                         proba = softmax(outputs, 1)
                         argmaxed_proba = torch.argmax(proba, 1)
@@ -143,11 +150,12 @@ def train_model(
                             stats[n_class] = [stats[n_class][0], stats[n_class][1] + correct_predictions, stats[n_class][2] + all_to_be_guessed]
 
                         if state == "train":
-                            loss.backward()
+                            total_loss = sum(losses)
+                            total_loss.backward()
                             optimizer.step()
 
                     # statistics
-                    running_loss += loss.item()
+                    running_loss += total_loss.item()
 
             # save and log epoch statistics
             epoch_loss = round(running_loss / n_imgs_loss, 5)

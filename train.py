@@ -100,7 +100,8 @@ def train_model(
             # {n_plane: [class_name, proper predictions, all observations to be guessed]}
             stats = {value[0] : [key, 0, 0] for key, value in trainsets[0].class_to_color.items()}
 
-            criterion = CrossEntropyLoss()
+            weights = [1.0, 2.0, 2.0]
+            criterion = CrossEntropyLoss(weights)
 
             if state == "train":
                 model.train()
@@ -130,10 +131,12 @@ def train_model(
                         outputs = model(split_image).to(device)
                         split_mask = split_mask.to(device)
 
-                        losses = []
-                        for n_class in range(n_classes):
-                            loss = classes_weights[n_class] * criterion(outputs[n_class, :, :], split_mask[n_class, :, :])
-                            losses.append(loss)
+                        loss = criterion(outputs, split_mask)
+
+                        # losses = []
+                        # for n_class in range(n_classes):
+                        #     loss = classes_weights[n_class] * criterion(outputs[n_class, :, :], split_mask[n_class, :, :])
+                        #     losses.append(loss)
 
                         proba = softmax(outputs, 1)
                         argmaxed_proba = torch.argmax(proba, 1)
@@ -151,8 +154,9 @@ def train_model(
                             stats[n_class] = [stats[n_class][0], stats[n_class][1] + correct_predictions, stats[n_class][2] + all_to_be_guessed]
 
                         if state == "train":
-                            total_loss = sum(losses)
-                            total_loss.backward()
+                            # total_loss = sum(losses)
+                            # total_loss.backward()
+                            loss.backward()
                             optimizer.step()
 
                     # statistics

@@ -160,7 +160,8 @@ def train_model(
                             optimizer.step()
 
                     # statistics
-                    running_loss += total_loss.item()
+                    # running_loss += total_loss.item()
+                    running_loss += loss.item()
 
             # save and log epoch statistics
             epoch_loss = round(running_loss / n_imgs_loss, 5)

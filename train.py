@@ -60,7 +60,7 @@ def train_model(
                                       False, download_datasets) for year in years_test]
     test_loaders = [DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False) for testset in testsets]
 
-    classes_weights = get_class_weights(trainsets[0])
+    classes_weights = get_class_weights(trainsets)
     print(f"classes_weights: {classes_weights}")
 
     n_train_observations = sum([len(dataset) for dataset in trainsets])

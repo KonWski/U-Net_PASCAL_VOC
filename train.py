@@ -100,7 +100,7 @@ def train_model(
             # {n_plane: [class_name, proper predictions, all observations to be guessed]}
             stats = {value[0] : [key, 0, 0] for key, value in trainsets[0].class_to_color.items()}
 
-            weights = [1.0, 2.0, 2.0]
+            weights = torch.tensor([1.0, 2.0, 2.0])
             criterion = CrossEntropyLoss(weights)
 
             if state == "train":

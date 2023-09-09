@@ -60,6 +60,9 @@ def train_model(
                                       False, download_datasets) for year in years_test]
     test_loaders = [DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False) for testset in testsets]
 
+    weights = get_balanced_class_weights(trainsets).to(device)
+    logging.info(f"Classes_weights: {weights}")
+
     n_train_observations = sum([len(dataset) for dataset in trainsets])
     n_test_observations = sum([len(dataset) for dataset in testsets])
 
@@ -96,9 +99,6 @@ def train_model(
             # predictions holder for statistics
             # {n_plane: [class_name, proper predictions, all observations to be guessed]}
             stats = {value[0] : [key, 0, 0] for key, value in trainsets[0].class_to_color.items()}
-            weights = get_balanced_class_weights(trainsets).to(device)
-            print(f"classes_weights: {weights}")
-
             criterion = CrossEntropyLoss(weights)
 
             if state == "train":

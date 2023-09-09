@@ -39,6 +39,6 @@ def get_balanced_class_weights(datasets: List[PascalVOCSegmentation]):
         class_weights[n_class] = all_observations / (n_classes * class_occurences[n_class])
 
     # loss class require weights to be a tensor
-    class_weights = torch.tensor(class_weights[n_class] for n_class in range(n_classes))
+    class_weights = torch.tensor([class_weights[n_class] for n_class in range(n_classes)])
 
     return class_weights

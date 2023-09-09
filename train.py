@@ -8,7 +8,7 @@ from torch.optim import Adam
 from model import uNetPascalVOC, save_checkpoint, load_checkpoint
 import logging
 from datetime import datetime
-from auxiliary import get_class_weights
+from auxiliary import get_balanced_class_weights
 
 def train_model(
         device, 
@@ -60,9 +60,6 @@ def train_model(
                                       False, download_datasets) for year in years_test]
     test_loaders = [DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False) for testset in testsets]
 
-    classes_weights = get_class_weights(trainsets)
-    print(f"classes_weights: {classes_weights}")
-
     n_train_observations = sum([len(dataset) for dataset in trainsets])
     n_test_observations = sum([len(dataset) for dataset in testsets])
 
@@ -99,8 +96,9 @@ def train_model(
             # predictions holder for statistics
             # {n_plane: [class_name, proper predictions, all observations to be guessed]}
             stats = {value[0] : [key, 0, 0] for key, value in trainsets[0].class_to_color.items()}
+            weights = get_balanced_class_weights(trainsets).to(device)
+            print(f"classes_weights: {weights}")
 
-            weights = torch.tensor([1.0, 2.0, 2.0]).to(device)
             criterion = CrossEntropyLoss(weights)
 
             if state == "train":
@@ -133,18 +131,9 @@ def train_model(
 
                         loss = criterion(outputs, split_mask)
 
-                        # losses = []
-                        # for n_class in range(n_classes):
-                        #     loss = classes_weights[n_class] * criterion(outputs[n_class, :, :], split_mask[n_class, :, :])
-                        #     losses.append(loss)
-
                         proba = softmax(outputs, 1)
                         argmaxed_proba = torch.argmax(proba, 1)
                         argmaxed_split_mask = torch.argmax(split_mask, 1)
-
-                        # print(f"outputs.shape: {outputs.shape}")
-                        # print(f"proba.shape: {proba.shape}")
-                        # print(f"split_mask.shape: {split_mask.shape}")
 
                         for n_class in range(outputs.shape[1]):
 
@@ -154,13 +143,10 @@ def train_model(
                             stats[n_class] = [stats[n_class][0], stats[n_class][1] + correct_predictions, stats[n_class][2] + all_to_be_guessed]
 
                         if state == "train":
-                            # total_loss = sum(losses)
-                            # total_loss.backward()
                             loss.backward()
                             optimizer.step()
 
                     # statistics
-                    # running_loss += total_loss.item()
                     running_loss += loss.item()
 
             # save and log epoch statistics

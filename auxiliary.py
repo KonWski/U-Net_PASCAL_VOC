@@ -1,19 +1,22 @@
 from dataset import PascalVOCSegmentation
 from torch.utils.data import DataLoader
 from typing import List
+import torch
 
-BATCH_SIZE = 1
-
-def get_class_weights(datasets: List[PascalVOCSegmentation]):
+def get_balanced_class_weights(datasets: List[PascalVOCSegmentation]):
     '''
-    Calculates loss weights for each class
+    Calculates balanced loss weights for each class according to following equation:
+    class_weight = all_observations / (n_classes * class_weight_observations)
+
+    datasets: List[PascalVOCSegmentation]
+        datasets from which all_observations and class_weight_observations will be calculated
     '''
     
-    n_selected_classes = len(datasets[0].selected_classes)
-    class_occurences = {n_class: 0.0 for n_class in range(n_selected_classes)}
-    class_weights = {n_class: 0.0 for n_class in range(n_selected_classes)}
+    n_classes = len(datasets[0].selected_classes)
+    class_occurences = {n_class: 0.0 for n_class in range(n_classes)}
+    class_weights = {n_class: 0.0 for n_class in range(n_classes)}
 
-    dataloaders = [DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False) for dataset in datasets]
+    dataloaders = [DataLoader(dataset, batch_size=1, shuffle=False) for dataset in datasets]
 
     # count occurences across all datasets
     for dataloader in dataloaders:
@@ -26,18 +29,16 @@ def get_class_weights(datasets: List[PascalVOCSegmentation]):
             for mask_piece in split_mask:
 
                 # calculate number of pixels with given class
-                for n_class in range(n_selected_classes):
+                for n_class in range(n_classes):
                     class_occurences[n_class] = class_occurences[n_class] + mask_piece[0][n_class, :, :].sum().item()
 
-    # find class with most occurences
-    most_common_class = 0
-    for n_class, n_occurences in class_occurences.items():
-
-        if n_occurences > class_occurences[most_common_class]:
-            most_common_class = n_class
-
     # calculate weights
+    all_observations = sum([class_occurences[n_class] for n_class in range(n_classes)])
+
     for n_class in class_weights.keys():
-        class_weights[n_class] = class_occurences[most_common_class] / class_occurences[n_class]
+        class_weights[n_class] = all_observations / (n_classes * class_occurences[n_class])
+
+    # loss class require weights to be a tensor
+    class_weights = torch.tensor(class_weights[n_class] for n_class in range(n_classes))
 
     return class_weights

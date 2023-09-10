@@ -97,8 +97,8 @@ def train_model(
             n_imgs_loss = 0
 
             # predictions holder for statistics
-            # {n_plane: [class_name, proper predictions, all observations to be guessed]}
-            stats = {value[0] : [key, 0, 0] for key, value in trainsets[0].class_to_color.items()}
+            # {n_plane: [class_name, proper predictions, all guesses, all observations to be guessed]}
+            stats = {value[0] : [key, 0, 0, 0] for key, value in trainsets[0].class_to_color.items()}
             criterion = CrossEntropyLoss(weights)
 
             if state == "train":
@@ -137,10 +137,14 @@ def train_model(
 
                         for n_class in range(outputs.shape[1]):
 
-                            proba_n_class = torch.where(argmaxed_proba == n_class, argmaxed_proba, -1)
-                            correct_predictions = (proba_n_class == argmaxed_split_mask).sum().item()
+                            all_guesses = torch.where(argmaxed_proba == n_class, argmaxed_proba, -1)
+                            correct_predictions = (all_guesses == argmaxed_split_mask).sum().item()
                             all_to_be_guessed = torch.where(argmaxed_split_mask == n_class, 1, 0).sum().item()
-                            stats[n_class] = [stats[n_class][0], stats[n_class][1] + correct_predictions, stats[n_class][2] + all_to_be_guessed]
+                            stats[n_class] = [
+                                stats[n_class][0], 
+                                stats[n_class][1] + correct_predictions, 
+                                stats[n_class][2] + all_guesses.item(), 
+                                stats[n_class][3] + all_to_be_guessed]
 
                         if state == "train":
                             loss.backward()
@@ -160,9 +164,10 @@ def train_model(
             # stats logs
             for key, value in stats.items():
                 class_name = value[0]
-                class_observations = value[2]
+                class_observations = value[3]
+                class_precission = round(value[1] / value[2], 2)
                 class_recall = round(value[1] / class_observations, 2)
-                logging.info(f"Class name: {class_name}, recall: {class_recall}, All observations: {class_observations}")
+                logging.info(f"Class name: {class_name}, class_precission: {class_precission}, recall: {class_recall}, All observations: {class_observations}")
                 
 
         if checkpoint["test_loss"] < best_test_loss:

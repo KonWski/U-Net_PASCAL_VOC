@@ -99,7 +99,8 @@ def train_model(
             # predictions holder for statistics
             # {n_plane: [class_name, proper predictions, all predictions, all observations to be guessed]}
             stats = {value[0] : [key, 0, 0, 0] for key, value in trainsets[0].class_to_color.items()}
-            criterion = CrossEntropyLoss(weights)
+            # criterion = CrossEntropyLoss(weights)
+            criterion = CrossEntropyLoss()
 
             if state == "train":
                 model.train()

@@ -127,6 +127,7 @@ def train_model(
                         optimizer.zero_grad()
                         
                         split_image = split_image.to(device)
+                        print(f"split_image.shape: {split_image.shape}")
                         outputs = model(split_image).to(device)
                         split_mask = split_mask.to(device)
 

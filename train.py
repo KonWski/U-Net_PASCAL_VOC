@@ -131,7 +131,7 @@ def train_model(
                         split_mask = split_mask.to(device)
 
                         print(f"outputs.shape: {outputs.shape}")
-                        print(f"split_mask.shape: {split_mask}")
+                        print(f"split_mask.shape: {split_mask.shape}")
 
                         loss = criterion(outputs, split_mask)
 

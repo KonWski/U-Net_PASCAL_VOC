@@ -130,6 +130,9 @@ def train_model(
                         outputs = model(split_image).to(device)
                         split_mask = split_mask.to(device)
 
+                        print(f"outputs.shape: {outputs.shape}")
+                        print(f"split_mask.shape: {split_mask}")
+
                         loss = criterion(outputs, split_mask)
 
                         proba = softmax(outputs, 1)

@@ -47,6 +47,12 @@ def train_model(
         width and height of smaller piece of mask
     default_boundary: int:
         padding size around cut out image piece
+    use_balanced_class_weights: bool
+        use balanced weights for unequal classes distribiution
+    initialize_model_weights: bool
+        initialize model weights using normal distribiution
+    load_model: bool
+        continue learning using existing model and optimizer
     '''
 
     BATCH_SIZE = 1

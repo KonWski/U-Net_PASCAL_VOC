@@ -18,30 +18,29 @@ def get_balanced_class_weights(use_balanced_class_weights: bool, datasets: List[
     class_occurences = {n_class: 0.0 for n_class in range(n_classes)}
     class_weights = {n_class: 1.0 for n_class in range(n_classes)}
 
-    if not use_balanced_class_weights:
-        return class_weights
+    if use_balanced_class_weights:
 
-    dataloaders = [DataLoader(dataset, batch_size=1, shuffle=False) for dataset in datasets]
+        dataloaders = [DataLoader(dataset, batch_size=1, shuffle=False) for dataset in datasets]
 
-    # count occurences across all datasets
-    for dataloader in dataloaders:
+        # count occurences across all datasets
+        for dataloader in dataloaders:
 
-        for id, batch in enumerate(dataloader, 0):
-            
-            image, split_image, split_mask = batch
+            for id, batch in enumerate(dataloader, 0):
+                
+                image, split_image, split_mask = batch
 
-            # perform calculations for each of mask piece
-            for mask_piece in split_mask:
+                # perform calculations for each of mask piece
+                for mask_piece in split_mask:
 
-                # calculate number of pixels with given class
-                for n_class in range(n_classes):
-                    class_occurences[n_class] = class_occurences[n_class] + mask_piece[0][n_class, :, :].sum().item()
+                    # calculate number of pixels with given class
+                    for n_class in range(n_classes):
+                        class_occurences[n_class] = class_occurences[n_class] + mask_piece[0][n_class, :, :].sum().item()
 
-    # calculate weights
-    all_observations = sum([class_occurences[n_class] for n_class in range(n_classes)])
+        # calculate weights
+        all_observations = sum([class_occurences[n_class] for n_class in range(n_classes)])
 
-    for n_class in class_weights.keys():
-        class_weights[n_class] = all_observations / (n_classes * class_occurences[n_class])
+        for n_class in class_weights.keys():
+            class_weights[n_class] = all_observations / (n_classes * class_occurences[n_class])
 
     # loss class require weights to be a tensor
     class_weights = torch.tensor([class_weights[n_class] for n_class in range(n_classes)])

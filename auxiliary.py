@@ -3,15 +3,20 @@ from torch.utils.data import DataLoader
 from typing import List
 import torch
 
-def get_balanced_class_weights(datasets: List[PascalVOCSegmentation]):
+def get_balanced_class_weights(use_balanced_class_weights: bool, datasets: List[PascalVOCSegmentation]):
     '''
     Calculates balanced loss weights for each class according to following equation:
     class_weight = all_observations / (n_classes * class_weight_observations)
 
+    use_balanced_class_weights: bool
+        
     datasets: List[PascalVOCSegmentation]
         datasets from which all_observations and class_weight_observations will be calculated
     '''
     
+    if not use_balanced_class_weights:
+        return None
+
     n_classes = len(datasets[0].selected_classes)
     class_occurences = {n_class: 0.0 for n_class in range(n_classes)}
     class_weights = {n_class: 0.0 for n_class in range(n_classes)}

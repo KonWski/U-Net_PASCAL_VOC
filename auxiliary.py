@@ -14,12 +14,12 @@ def get_balanced_class_weights(use_balanced_class_weights: bool, datasets: List[
         datasets from which all_observations and class_weight_observations will be calculated
     '''
     
-    if not use_balanced_class_weights:
-        return None
-
     n_classes = len(datasets[0].selected_classes)
     class_occurences = {n_class: 0.0 for n_class in range(n_classes)}
-    class_weights = {n_class: 0.0 for n_class in range(n_classes)}
+    class_weights = {n_class: 1.0 for n_class in range(n_classes)}
+
+    if not use_balanced_class_weights:
+        return class_weights
 
     dataloaders = [DataLoader(dataset, batch_size=1, shuffle=False) for dataset in datasets]
 

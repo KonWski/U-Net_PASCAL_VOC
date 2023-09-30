@@ -1,5 +1,5 @@
 # U-Net_PASCAL_VOC
-Following repository is an example implementation of U-Net neural network architecture introduced by Olaf Ronneberger et. al. in [Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/abs/1505.04597). Built model isn't exactly the same as in original paper because of different type of data used in project. However Readme consists not only of short explanations refering to original paper but also of instructions on how to train and use U-net inspired neural net.
+Following repository is an example implementation of U-Net neural network architecture introduced by Olaf Ronneberger et. al. in [Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/abs/1505.04597). Following document consists of short explanations refering to the original paper and of instructions on how to train and use U-net inspired neural net.
 
 Data used for project come from PASCAL VOC dataset available through Torchvision. Model was created using PyTorch library.
 

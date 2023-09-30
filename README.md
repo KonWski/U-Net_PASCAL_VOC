@@ -147,3 +147,6 @@ for id, batch in enumerate(dataloader, 0):
         show_mask(image[0], outputs, selected_class)
         break
 ```
+Example visualization:
+
+![mask_visualization](/images/mask_visualization.png)

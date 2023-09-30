@@ -1,4 +1,4 @@
-# U-Net_PASCAL_VOC [Under construction]
+# U-Net_PASCAL_VOC
 Following repository is an example implementation of U-Net neural network architecture introduced by Olaf Ronneberger et. al. in [Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/abs/1505.04597). Built model isn't exactly the same as in original paper because of different type of data used in project. However Readme consists not only of short explanations refering to original paper but also of instructions on how to train and use U-net inspired neural net.
 
 Data used for project come from PASCAL VOC dataset available through Torchvision. Model was created using PyTorch library.
@@ -48,4 +48,102 @@ $E = \sum_{\textbf{x} \in \Omega} w(\textbf{x}) log(p_{l(\textbf{x})}(\textbf{x}
 
 which penalizes small U-Net's soft max values for correct class. In this case $l:\Omega \rightarrow \{1,..,K\}$ returns correct class for pixel $\textbf{x}$, where K is the number of classes.
 
-# How to train model
+# How to work with project
+
+## Training a model
+```
+!python /content/U-Net_PASCAL_VOC/main.py --n_epochs 400 \
+                                          --checkpoints_dir 'drive/MyDrive/Colab Notebooks/tutoriale/u-net/modele'\
+                                          --download_datasets 'true' \
+                                          --root_datasets_dir 'PASCAL_VOC_dataset' \
+                                          --years_train '2007,2008,2009,2010,2011,2012' \
+                                          --years_test '2007,2008,2009,2010' \
+                                          --selected_classes 'border,cow' \
+                                          --splitted_mask_size 100 \
+                                          --default_boundary_size 98 \
+                                          --use_balanced_class_weights 'N' \
+                                          --initialize_model_weights 'Y' \
+                                          --load_model 'N'
+```
+
+Args used in command:
+- n_epochs - number of epochs
+- checkpoints_dir - path to directory where checkpoint will be saved
+- download_datasets - download dataset from Torchvision repo or use already existing dataset
+- root_datasets_dir - path where dataset should be downloaded or where is it already stored
+- years_train - years of Pascal VOC competition "2007" to "2012" separated by commas used for training
+- years_test - years of Pascal VOC competition "2007" to "2012" separated by commas used for testing
+- selected_classes - classes seperated by commas
+- splitted_mask_size - width and height of smaller piece of mask
+- default_boundary_size - padding size around cut out image piece
+- use_balanced_class_weights - use balanced  weights for unequal classes distribiution
+- initialize_model_weights - initialize model weights using normal distribiution
+- load_model - Y -> continue learning using existing model and optimizer
+
+## Visualizing masks
+Import libraries:
+```python
+from model import load_checkpoint, uNetPascalVOC
+from dataset import PascalVOCSegmentation
+from visualize import concat_split_mask, show_mask
+from torch.utils.data import DataLoader
+from torchvision.utils import draw_segmentation_masks
+from torchvision.transforms.functional import to_tensor
+import matplotlib.pyplot as plt
+import torch
+```
+
+Initialise Dataset and Dataloader
+```python
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+# parameters for dataset
+selected_classes = ["background", "border", "cow"]
+splitted_mask_size = 100
+default_boundary = 98
+
+# initiate dataset, dataloader
+dataset = PascalVOCSegmentation("/path/to/your/dataset", "2007", "test", selected_classes, splitted_mask_size, default_boundary, False, download=True)
+dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
+```
+
+Load model
+```python
+# load checkpoint
+checkpoint = torch.load("path/to/your/checkpoint")
+
+# initiate model
+model = uNetPascalVOC(checkpoint["max_depth_level"], len(checkpoint["selected_classes"]))
+model.to(device)
+
+# load parameters from checkpoint
+model.load_state_dict(checkpoint["model_state_dict"])
+```
+
+Visualize mask
+```python
+selected_img = 10
+selected_class = 2
+
+for id, batch in enumerate(dataloader, 0):
+
+    if id == selected_img:
+
+        # extract data from batch
+        image, split_image, split_mask = batch
+        image = image.permute(0, 3, 1, 2)
+
+        split_image = [img_piece[0] for img_piece in split_image]
+        split_image = torch.stack(split_image)
+
+        # run model on extracted data
+        split_image = split_image.to(device)
+
+        # softmax output and concat to a single image
+        outputs = model(split_image).to(device)
+        outputs = torch.nn.functional.softmax(outputs, dim=1)
+        outputs = concat_split_mask(outputs, image, 3)
+
+        show_mask(image[0], outputs, selected_class)
+        break
+```

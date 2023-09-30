@@ -76,6 +76,9 @@ def show_mask(original_image: torch.Tensor, mask: torch.Tensor, presented_class:
     # create grid with 1 row and 2 columns
     fig, ax = plt.subplots(nrows = 1, ncols = 2)
 
+    # remove space between images
+    plt.subplots_adjust(wspace=0, hspace=0)
+
     ax[0].imshow(original_image.permute(1, 2, 0))
     ax[0].axis("off")
     

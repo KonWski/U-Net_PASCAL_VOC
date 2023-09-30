@@ -1,6 +1,7 @@
 from typing import List
 from math import ceil
 import torch
+import matplotlib.pyplot as plt
 
 def concat_split_mask(split_mask: List[torch.Tensor], original_image: torch.Tensor, n_selected_classes: int):
     '''
@@ -44,3 +45,39 @@ def concat_split_mask(split_mask: List[torch.Tensor], original_image: torch.Tens
             mask_split_iterator += 1
 
     return mask
+
+
+def show_mask(original_image: torch.Tensor, mask: torch.Tensor, presented_class: int):
+    '''
+    shows pair of images - original image and its generated mask (for presented_class)
+    
+    Parameters
+    ----------
+    original_image: torch.Tensor
+        input for the model generating mask
+    mask: torch.Tensor
+        mask generated from original image
+    presented_class: int
+        class which will be emphasized in the visualization
+    '''
+
+    # mark pixels with class with biggest output value
+    highest_class = torch.argmax(mask, 0)
+    unique_classes = highest_class.unique()
+
+    # turn tensor's values into 1-0 
+    for value in unique_classes:
+        value = value.item()
+        boolean_mask = (highest_class == value)
+
+    # select only those pixels reffering to presented class
+    boolean_mask = (highest_class == presented_class)
+
+    # create grid with 1 row and 2 columns
+    fig, ax = plt.subplots(nrows = 1, ncols = 2)
+
+    ax[0].imshow(original_image.permute(1, 2, 0))
+    ax[0].axis("off")
+    
+    ax[1].imshow(boolean_mask.int())
+    ax[1].axis("off")
